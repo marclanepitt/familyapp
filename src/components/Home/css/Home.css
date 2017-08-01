@@ -1,0 +1,40 @@
+.top {
+	height: 700px;
+    background: url(../img/home-bg.jpg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow-x: hidden; 
+ }
+
+.about-section {
+	height: 400px;
+	background-color: whitesmoke;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow-x: hidden; 
+
+}
+
+.contact-section {
+	height: 400px;
+	background-color: blue;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow-x: hidden; 
+}
+
+.navbar {
+	opacity: .8;
+}
+
+.circle-element {
+	width: 200px;
+	height: 200px;
+	border-radius: 200px;
+	background-color: whitesmoke;
+}
+
+.center-col {
+	float: none;
+    margin: 0 auto;
+}
