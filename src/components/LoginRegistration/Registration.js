@@ -12,7 +12,19 @@ import {
   ControlLabel,
   HelpBlock
 } from "react-bootstrap";
+import {
+  Step,
+  Stepper,
+  StepButton,
+  StepContent,
+} from 'material-ui/Stepper';
+import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+
 const Api = ApiInstance.instance;
+injectTapEventPlugin();
+
 
 export default class Registration extends Component {
   constructor(props) {
@@ -23,27 +35,19 @@ export default class Registration extends Component {
       password2: "",
       firstName: "",
       lastName: "",
-      institution: "",
-      major: "",
-      year: "",
+      familyName: "",
+      familyProPic: "",
       step: 1,
-      institutions: null,
-      majors: null,
       errors: {},
-      loading: ""
+      loading: "",
+      stepIndex: 0
     };
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.nextStep = this.nextStep.bind(this);
     this.backStep = this.backStep.bind(this);
-    this.getInstitutions = this.getInstitutions.bind(this);
-    this.getMajors = this.getMajors.bind(this);
   }
 
-  componentDidMount() {
-    this.getInstitutions();
-    this.getMajors();
-  }
 
   handleInputChange(e, field) {
     const { state } = this;
@@ -121,18 +125,6 @@ export default class Registration extends Component {
     this.setState({ step: 1 });
   }
 
-  getInstitutions() {
-    Api.getInstitutions().then(response => {
-      this.setState({ institutions: response.data });
-    });
-  }
-
-  getMajors() {
-    Api.getMajors().then(response => {
-      this.setState({ majors: response.data });
-    });
-  }
-
   handleOnSubmit(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -143,9 +135,8 @@ export default class Registration extends Component {
       email,
       password,
       password2,
-      institution,
-      year,
-      major
+      familyName,
+      familyProPic,
     } = this.state;
     const data = {
       email,
@@ -153,10 +144,9 @@ export default class Registration extends Component {
       password2,
       first_name: firstName,
       last_name: lastName,
-      user_profile: {
-        institution: institution,
-        year: year,
-        major: [major]
+      family : {
+        name: familyName,
+        pro_pic: familyProPic,
       }
     };
 
@@ -176,6 +166,44 @@ export default class Registration extends Component {
     return false;
   }
 
+
+  handleNext = () => {
+    const {stepIndex} = this.state;
+    if (stepIndex < 2) {
+      this.setState({stepIndex: stepIndex + 1});
+    }
+  };
+
+  handlePrev = () => {
+    const {stepIndex} = this.state;
+    if (stepIndex > 0) {
+      this.setState({stepIndex: stepIndex - 1});
+    }
+  };
+
+  renderStepActions(step) {
+    return (
+      <div style={{margin: '12px 0'}}>
+        <RaisedButton
+          label="Next"
+          disableTouchRipple={true}
+          disableFocusRipple={true}
+          primary={true}
+          onTouchTap={this.handleNext}
+          style={{marginRight: 12}}
+        />
+        {step > 0 && (
+          <FlatButton
+            label="Back"
+            disableTouchRipple={true}
+            disableFocusRipple={true}
+            onTouchTap={this.handlePrev}
+          />
+        )}
+      </div>
+    );
+  }
+
   render() {
     const {
       firstName,
@@ -183,96 +211,48 @@ export default class Registration extends Component {
       email,
       password,
       password2,
-      institution,
-      year,
-      major,
-      step,
-      institutions,
-      majors,
-      loading
+      familyProPic,
+      familyName,
+      loading,
+      stepIndex,
     } = this.state;
     return (
       <div>
+
         <div
           className="overlay"
           style={{ display: loading ? "block" : "none" }}
         >
           <div className="loader" />
         </div>
-        <br />
-        <div className="login-div">
-          <div className="text-center">
-            <br />
-            <div className="title-div">
-              <h1> Register </h1>
-            </div>
-          </div>
-          <div className="inner-div">
-            <br />
-            <form className="login-form" onSubmit={this.handleOnSubmit}>
-
-              {step === 1 &&
-                <div id="step1">
-                  <FormGroup
-                    controlId="email"
-                    validationState={this.validateEmail()}
-                  >
-                    <FormControl
-                      type="text"
-                      value={email}
-                      placeholder="Email"
-                      onChange={e => this.handleInputChange(e, "email")}
-                    />
-                    <FormControl.Feedback />
-                    <HelpBlock validationState={"error"}>
-                      {this.state.errors.email}
-                    </HelpBlock>
-                  </FormGroup>
-                  <FormGroup
-                    controlId="password"
-                    validationState={this.validatePassword()}
-                  >
-                    <FormControl
-                      type="password"
-                      value={password}
-                      placeholder="Password"
-                      onChange={e => this.handleInputChange(e, "password")}
-                    />
-                    <FormControl.Feedback />
-                    <HelpBlock validationState={"error"}>
-                      {this.state.errors.password1}
-                    </HelpBlock>
-                  </FormGroup>
-                  <FormGroup
-                    controlId="confirm_password"
-                    validationState={this.validatePassword2()}
-                  >
-                    <FormControl
-                      type="password"
-                      value={password2}
-                      placeholder="Confirm Password"
-                      onChange={e => this.handleInputChange(e, "password2")}
-                    />
-                    <FormControl.Feedback />
-                    <HelpBlock validationState={"error"}>
-                      {this.state.errors.password2}
-                    </HelpBlock>
-                  </FormGroup>
-                  <div className="text-center">
-                    <Button
-                      bsStyle="success"
-                      onClick={() => {
-                        this.nextStep();
-                      }}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>}
-
-              {step === 2 &&
-                <div id="step2">
-                  <FormGroup controlId="firstName" validationState={this.validateOthers('first_name')}>
+         <div style={{maxWidth: 500, maxHeight: 400, margin: 'auto'}}>
+             <form className="login-form" onSubmit={this.handleOnSubmit}>
+                <Stepper
+                  activeStep={stepIndex}
+                  linear={false}
+                  orientation="vertical"
+                >
+                  <Step>
+                    <StepButton onTouchTap={() => this.setState({stepIndex: 0})}>
+                      Create Account
+                    </StepButton>
+                    <StepContent className="fixed-step-content">
+                        <FormGroup
+                        controlId="email"
+                        validationState={this.validateEmail()}
+                        >
+                        <FormControl
+                          type="text"
+                          value={email}
+                          placeholder="Email"
+                          onChange={e => this.handleInputChange(e, "email")}
+                        />
+                        <FormControl.Feedback />
+                        <HelpBlock validationState={"error"}>
+                          {this.state.errors.email}
+                        </HelpBlock>
+                      </FormGroup>
+                      <FormGroup controlId="firstName" validationState={this.validateOthers('first_name')}>
                     <FormControl
                       type="text"
                       value={firstName}
@@ -296,76 +276,90 @@ export default class Registration extends Component {
                       {this.state.errors.last_name}
                     </HelpBlock>
                   </FormGroup>
-                  <FormGroup controlId="institution" id="institution-group">
-                    <FormControl
-                      value={institution}
-                      componentClass="select"
-                      onChange={e => this.handleInputChange(e, "institution")}
-                    >
-                      <option value="">School</option>
-                      {institutions.map(institution =>
-                        <option value={institution.id}>
-                          {institution.name}
-                        </option>
-                      )}
-                    </FormControl>
-                    <HelpBlock />
-                  </FormGroup>
-                  <FormGroup controlId="major" id="major-group">
-                    <FormControl
-                      value={major}
-                      componentClass="select"
-                      onChange={e => this.handleInputChange(e, "major")}
-                    >
-                      <option value="">Major</option>
-                      {majors.map(major =>
-                        <option value={major.id}>{major.major}</option>
-                      )}
-                    </FormControl>
-                  </FormGroup>
-                  <HelpBlock>
-                    {/*this.state.errors.user_profile.major*/}
-                  </HelpBlock>
-                  <FormGroup controlId="year">
-                    <FormControl
-                      value={year}
-                      componentClass="select"
-                      onChange={e => this.handleInputChange(e, "year")}
-                    >
-                      <option value="">Year</option>
-                      <option value="FR">Freshman</option>
-                      <option value="SO">Sophomore</option>
-                      <option value="JR">Junior</option>
-                      <option value="SR">Senior</option>
-                      <option value="GR">Graduate Student</option>
-                      <option value="FC">Faculty</option>
+                      <FormGroup
+                        controlId="password"
+                        validationState={this.validatePassword()}
+                      >
+                        <FormControl
+                          type="password"
+                          value={password}
+                          placeholder="Password"
+                          onChange={e => this.handleInputChange(e, "password")}
+                        />
+                        <FormControl.Feedback />
+                        <HelpBlock validationState={"error"}>
+                          {this.state.errors.password1}
+                        </HelpBlock>
+                      </FormGroup>
+                      <FormGroup
+                        controlId="confirm_password"
+                        validationState={this.validatePassword2()}
+                      >
+                        <FormControl
+                          type="password"
+                          value={password2}
+                          placeholder="Confirm Password"
+                          onChange={e => this.handleInputChange(e, "password2")}
+                        />
+                        <FormControl.Feedback />
+                        <HelpBlock validationState={"error"}>
+                          {this.state.errors.password2}
+                        </HelpBlock>
+                      </FormGroup>
+                      {this.renderStepActions(0)}
+                    </StepContent>
+                  </Step>
+                  <Step>
+                    <StepButton onTouchTap={() => this.setState({stepIndex: 2})}>
+                      Create Family
+                    </StepButton>
+                    <StepContent className="fixed-step-content">
+                      <div style={{margin: '12px 0'}}>
+                          <FormGroup
+                        controlId="family_name"
+                        validationState={this.validateOthers("family.name")}
+                          >
+                            <FormControl
+                              type="text"
+                              value={familyName}
+                              placeholder="Family Name"
+                              onChange={e => this.handleInputChange(e, "familyName")}
+                            />
+                          </FormGroup>
+                        <FormGroup
+                        controlId="family_pic"
+                        validationState={this.validateOthers("family.pro_pic")}
+                          >
+                            <FormControl
+                              type="file"
+                              value=""
+                              placeholder="Family Picture"
+                              onChange={e => this.handleInputChange(e, "familyProPic")}
+                            />
+                          </FormGroup>
+                        <div className = "row">
+                        <RaisedButton
+                          label="Register"
+                          disableTouchRipple={true}
+                          disableFocusRipple={true}
+                          primary={true}
+                          type="submit"
+                        />
+                        </div>
+                        <br/>
+                      </div>
+                    </StepContent>
+                  </Step>
+                </Stepper>
+             </form>
+      </div>
 
-                    </FormControl>
-                    <HelpBlock>
-                      {/*this.state.errors.user_profile.year*/}
-                    </HelpBlock>
-                  </FormGroup>
-                  <ButtonToolbar>
-                    <Button
-                      bsStyle="warning"
-                      onClick={() => {
-                        this.backStep();
-                      }}
-                    >
-                      Back
-                    </Button>
-                    <Button bsStyle="success" type="submit">Register</Button>
-                  </ButtonToolbar>
-                </div>}
-            </form>
             <div className="text-center">
               <br />
               <p>
                 {" "}Already have an account? Login{" "}
                 <Link to="login"> here!</Link>
               </p>
-            </div>
-          </div>
         </div>
       </div>
     );

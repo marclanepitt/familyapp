@@ -13,15 +13,25 @@ import {
   NavDropdown,
   MenuItem
 } from "react-bootstrap";
-import user_placeholder from "../../img/user_placeholder.png";
+import {List, ListItem} from 'material-ui/List';
+import ActionInfo from 'material-ui/svg-icons/action/info';
+import Divider from 'material-ui/Divider';
+import Subheader from 'material-ui/Subheader';
+import Avatar from 'material-ui/Avatar';
+import FileFolder from 'material-ui/svg-icons/file/folder';
+import ActionAssignment from 'material-ui/svg-icons/action/assignment';
+import {blue500, yellow600} from 'material-ui/styles/colors';
+import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart';
 
 const Api = ApiInstance.instance;
+
 
 export default class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: {}
+      user: {},
+      loading: true
     };
     this.logout = this.logout.bind(this);
     this.greeting = this.greeting.bind(this);
@@ -30,7 +40,12 @@ export default class Main extends Component {
   componentDidMount() {
     if (Api.isAuthenticated()) {
       Promise.resolve(Api.getUser()).then(response => {
-        this.setState({ user: response });
+        this.setState({ 
+          user: response,
+          loading: false
+        });
+              console.log(response)
+
       });
     } else {
       this.props.router.push("/login");
@@ -39,8 +54,9 @@ export default class Main extends Component {
 
   logout() {
     Api.logoutUser().then(response => {
-      this.setState({ user: {} });
       this.props.router.push("/login");
+      this.setState({ user: {} });
+
     });
   }
 
@@ -58,147 +74,82 @@ export default class Main extends Component {
   }
 
   render() {
-    const { user } = this.state;
+    const { user,loading } = this.state;
     const greeting = this.greeting;
+
     return (
       <div className="App">
-        <div id="navbar-wrapper">
-          <header>
-            <nav
-              className="navbar navbar-default navbar-fixed-top"
-              role="navigation"
-            >
-              <div className="container-fluid">
-                <div className="navbar-header">
-                  <button
-                    type="button"
-                    className="navbar-toggle"
-                    data-toggle="collapse"
-                    data-target="#navbar-collapse"
-                  >
-                    <span className="sr-only">Toggle navigation</span>
-                    <span className="icon-bar" />
-                    <span className="icon-bar" />
-                    <span className="icon-bar" />
-                  </button>
-                  <a className="navbar-brand" href="#">Family</a>
-                </div>
-                <div id="navbar-collapse" className="collapse navbar-collapse">
-                  <ul className="nav navbar-nav navbar-right">
-                    <NavDropdown>
-                      <MenuItem>
-                        <a
-                          id="user-profile"
-                          href="#"
-                          className="dropdown-toggle"
-                          data-toggle="dropdown"
-                        >
-                          <img
-                            src={user_placeholder}
-                            className="img-responsive img-thumbnail img-circle"
-                          />{" "}
-                        </a>
-                      </MenuItem>
-                      <MenuItem />
-                      <MenuItem>
-                        <Button onClick={this.logout} bsStyle={"danger"}>
-                          Logout
-                        </Button>
-                      </MenuItem>
-                    </NavDropdown>
-                  </ul>
+      {loading ?
+        <div
+            className="overlay"
+            style={{ display: loading ? "block" : "none" }}
+        >
+            <div className="loader" />
+        </div>
+        :
+          <div>
+<div id="header" className="navbar navbar-default navbar-fixed-top">
+    <div className="navbar-header">
+        <button className="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+            <i className="icon-reorder"></i>
+        </button>
+        <a className="navbar-brand" href="#">
+            Family
+        </a>
+    </div>
+    <nav className="collapse navbar-collapse">
+        <ul className="nav navbar-nav">
+            <li>
+                <a href="#">Navbar Item 1</a>
+            </li>
+            <li className="dropdown">
+              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Navbar Item 2<b className="caret"></b></a>
+                <ul className="dropdown-menu">
+                    <li><a href="#">Navbar Item2 - Sub Item 1</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Navbar Item 3</a>
+            </li>
+        </ul>
+        <ul className="nav navbar-nav pull-right">
+        </ul>
+    </nav>
+</div>
+<div id="wrapper">
+  <div id="sidebar-wrapper" className="col-md-1">
+            <div id="sidebar">
+                <ul className="nav list-group">
+                    <li>
+                      <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 1</a>
+                    </li>
+                    <li>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 2</a>
+                    </li>
+                    <li>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 9</a>
+                    </li>
+                    <li>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 10</a>
+                    </li>
+                    <li>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 11</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="main-wrapper" className="col-md-11 pull-right">
+            <div id="main">
+              <div className="family-header">
+                <div className="ratio img-responsive img-circle" style={{backgroundImage : this.state.user.userprofile.family.pro_pic}}>
                 </div>
               </div>
-            </nav>
-          </header>
+            </div>
+          
         </div>
-        <div id="wrapper">
-          <div id="sidebar-wrapper">
-            <aside id="sidebar">
-              <ul id="sidemenu" className="sidebar-nav">
-                <li>
-                  <Link to="/app/">
-                    <span className="sidebar-icon">
-                      <i className="fa fa-dashboard" />
-                    </span>
-                    <span className="sidebar-title">Home</span>
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    className="accordion-toggle collapsed toggle-switch"
-                    data-toggle="collapse"
-                    href="#submenu-2"
-                  >
-                    <span className="sidebar-icon">
-                      <i className="fa fa-users" />
-                    </span>
-                    <span className="sidebar-title">Management</span>
-                    <b className="caret" />
-                  </a>
-                  <ul
-                    id="submenu-2"
-                    className="panel-collapse collapse panel-switch"
-                    role="menu"
-                  >
-                    <li>
-                      <a href="#"><i className="fa fa-caret-right" />Users</a>
-                    </li>
-                    <li>
-                      <a href="#"><i className="fa fa-caret-right" />Roles</a>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <a
-                    className="accordion-toggle collapsed toggle-switch"
-                    data-toggle="collapse"
-                    href="#submenu-3"
-                  >
-                    <span className="sidebar-icon">
-                      <i className="fa fa-newspaper-o" />
-                    </span>
-                    <span className="sidebar-title">Blog</span>
-                    <b className="caret" />
-                  </a>
-                  <ul
-                    id="submenu-3"
-                    className="panel-collapse collapse panel-switch"
-                    role="menu"
-                  >
-                    <li>
-                      <a href="#"><i className="fa fa-caret-right" />Posts</a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i className="fa fa-caret-right" />Comments
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <a href="#">
-                    <span className="sidebar-icon">
-                      <i className="fa fa-database" />
-                    </span>
-                    <span className="sidebar-title">Data</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <span className="sidebar-icon">
-                      <i className="fa fa-terminal" />
-                    </span>
-                    <span className="sidebar-title">Console</span>
-                  </a>
-                </li>
-              </ul>
-            </aside>
+</div>
           </div>
-          <main id="page-content-wrapper" role="main">
-            {this.props.children}
-          </main>
-        </div>
+      }
       </div>
     );
   }
