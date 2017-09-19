@@ -32,7 +32,7 @@ export default class Login extends Component {
 
     componentDidMount() {
         if (Api.isAuthenticated()) {
-            this.props.router.push("/app");
+            this.props.router.push("/profile");
         }
     }
 
@@ -55,7 +55,7 @@ export default class Login extends Component {
         const onSuccess = response => {
             const { token, user } = response.data;
             Api.store("uuid", token);
-            this.props.router.push("/app");
+            this.props.router.push("/profile");
         };
 
         const onError = err => {

@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import { Router, Route, IndexRoute, browserHistory } from "react-router";
 import App from "./components/App/App";
 import Home from "./components/Home/Home";
-import Email from "./components/LoginRegistration/Email";
+import Email from "./components/LoginRegistration/UserEmail";
 import Login from "./components/LoginRegistration/Login";
+import LoginUser from "./components/LoginRegistration/LoginUser";
 import Registration from "./components/LoginRegistration/Registration";
 import Main from "./components/Family/Main"
 import Dashboard from "./components/Family/Dashboard"
@@ -19,6 +20,7 @@ ReactDOM.render(
         <Route path = "/" component = {App}>
             <IndexRoute component={Home} />
             <Route path="login" component={Login} />
+            <Route path="profile" component={LoginUser}/>
             <Route path="register" component={Registration} />
             <Route path = "email" component={Email}/>
             <Route path = "app" component={Main}>

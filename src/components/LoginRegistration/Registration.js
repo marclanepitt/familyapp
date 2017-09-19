@@ -51,7 +51,11 @@ export default class Registration extends Component {
 
   handleInputChange(e, field) {
     const { state } = this;
-    state[field] = e.target.value;
+    if(e.target.type === "file") {
+      state[field] = e.target.files[0];
+    } else {
+      state[field] = e.target.value;
+    }
     this.setState(state);
   }
 
@@ -128,6 +132,7 @@ export default class Registration extends Component {
   handleOnSubmit(e) {
     e.preventDefault();
     e.stopPropagation();
+    var formData = new FormData();
     this.setState({ loading: "overlay" });
     const {
       firstName,
@@ -149,6 +154,13 @@ export default class Registration extends Component {
         pro_pic: familyProPic,
       }
     };
+    formData.append("email",email);
+    formData.append("first_name",firstName);
+    formData.append("last_name",lastName);
+    formData.append("password1",password);
+    formData.append("password2",password2);
+    formData.append("family.pro_pic",familyProPic);
+    formData.append("family.name",familyName);
 
     const onSuccess = response => {
       this.props.router.push("/email");
@@ -162,7 +174,7 @@ export default class Registration extends Component {
       this.validateEmail();
       this.validateOthers();
     };
-    let response = Api.registerUser(data, onSuccess, onError);
+    Api.registerUser(formData, onSuccess, onError);
     return false;
   }
 
@@ -226,7 +238,7 @@ export default class Registration extends Component {
           <div className="loader" />
         </div>
          <div style={{maxWidth: 500, maxHeight: 400, margin: 'auto'}}>
-             <form className="login-form" onSubmit={this.handleOnSubmit}>
+             <form id="form" className="login-form" onSubmit={this.handleOnSubmit}>
                 <Stepper
                   activeStep={stepIndex}
                   linear={false}
@@ -242,6 +254,7 @@ export default class Registration extends Component {
                         validationState={this.validateEmail()}
                         >
                         <FormControl
+                            name="email"
                           type="text"
                           value={email}
                           placeholder="Email"
@@ -254,6 +267,7 @@ export default class Registration extends Component {
                       </FormGroup>
                       <FormGroup controlId="firstName" validationState={this.validateOthers('first_name')}>
                     <FormControl
+                        name="first_name"
                       type="text"
                       value={firstName}
                       placeholder="First Name"
@@ -266,6 +280,7 @@ export default class Registration extends Component {
                   </FormGroup>
                   <FormGroup controlId="lastName" validationState={this.validateOthers('last_name')}>
                     <FormControl
+                        name="last_name"
                       type="text"
                       value={lastName}
                       placeholder="Last Name"
@@ -281,6 +296,7 @@ export default class Registration extends Component {
                         validationState={this.validatePassword()}
                       >
                         <FormControl
+                            name="password1"
                           type="password"
                           value={password}
                           placeholder="Password"
@@ -296,6 +312,7 @@ export default class Registration extends Component {
                         validationState={this.validatePassword2()}
                       >
                         <FormControl
+                            name="password2"
                           type="password"
                           value={password2}
                           placeholder="Confirm Password"
@@ -320,6 +337,7 @@ export default class Registration extends Component {
                         validationState={this.validateOthers("family.name")}
                           >
                             <FormControl
+                                name="family.name"
                               type="text"
                               value={familyName}
                               placeholder="Family Name"
@@ -331,8 +349,8 @@ export default class Registration extends Component {
                         validationState={this.validateOthers("family.pro_pic")}
                           >
                             <FormControl
+                                name="family.pro_pic"
                               type="file"
-                              value=""
                               placeholder="Family Picture"
                               onChange={e => this.handleInputChange(e, "familyProPic")}
                             />

@@ -9,9 +9,21 @@ class Api {
     this.user = {};
     this.apiVersion = "v1";
     this.url = "http://localhost:8000/api";
-    this.institutions = [];
   }
 
+  toDataURL(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        callback(reader.result);
+      }
+      reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+  }
   generateUrl(url, version=null) {
     if(version == null) {
       return `${this.url}/${url}`;
@@ -29,10 +41,15 @@ class Api {
       .post(this.generateUrl("auth/registration/"), data)
       .then(response => {
         onSuccess(response);
+        this.store("fuuid",response.data.family);
       })
       .catch(err => {
         onError(err);
       });
+  }
+
+  getFamilyID() {
+    return Cookies.get("fuuid") || "";
   }
 
   loginUser(data, onSuccess, onError) {
@@ -43,6 +60,7 @@ class Api {
       .post(this.generateUrl("auth/login/"), {}, config)
       .then(response => {
         this.user = response.data.user;
+        console.log(this.user);
         this.uuid = response.data.token;
         return onSuccess(response);
       })
@@ -84,18 +102,14 @@ class Api {
     }
   }
 
+  getUserProfiles() {
+
+  }
+
   isAuthenticated() {
     return this.uuid !== "";
   }
 
-//add callbacks
-  getInstitutions() {
-    return axios.get(this.generateUrl("institutions/",'v1'));
-  }
-
-  getMajors() {
-    return axios.get(this.generateUrl("majors/","v1"));
-  }
 }
 export default class ApiInstance {
   static get instance() {

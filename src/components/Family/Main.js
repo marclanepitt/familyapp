@@ -141,8 +141,7 @@ export default class Main extends Component {
         <div id="main-wrapper" className="col-md-11 pull-right">
             <div id="main">
               <div className="family-header">
-                <div className="ratio img-responsive img-circle" style={{backgroundImage : this.state.user.userprofile.family.pro_pic}}>
-                </div>
+                <button onClick={this.logout}>Logout</button>
               </div>
             </div>
           
