@@ -85,20 +85,20 @@ export default class Login extends Component {
                     <div className="loader" />
                 </div>
                 <br />
-                <div className="login-div">
-                    <div className="text-center">
-                        <br />
-                        <div className="title-div">
-                            <h1> Login </h1>
-                        </div>
-                    </div>
-                    <div className="inner-div">
+                <div className = "row">
+                <div className="left col col-sm-6">
+                    <h1 style={{marginTop:200}}>Add Images and whatever of all the stuff the app can do here</h1>
+                </div>
+                    <div className="col col-sm-6" style={{marginBottom:15}}>
                       <Alert bsStyle="danger" className = {this.state.error_display}>
                         <strong>Oops!</strong> {this.state.errors}
                       </Alert>
                         <br />
+
+                        <div className="login-div col col-sm-4 col-md-offset-4 ">
+                            <h2>Family App </h2>
+                            <h4>Sign Into Your Account</h4>
                         <form
-                            className="login-form"
                             onSubmit={this.handleOnSubmit}
                         >
                             <FormGroup
@@ -129,16 +129,15 @@ export default class Login extends Component {
                                 </Button>
                             </div>
                         </form>
+                        </div>
+                    </div>
                         <div className="text-center">
-                            <br />
-                            <br />
                             <p>
                                 {" "}Don't have an account? Sign up{" "}
                                 <Link to="register"> here!</Link>
                             </p>
                         </div>
-                    </div>
-                </div>
+            </div>
             </div>
         );
     }

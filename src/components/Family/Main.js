@@ -110,7 +110,7 @@ export default class Main extends Component {
         </ul>
         <ul className="nav navbar-nav pull-right">
           <li>
-            <button onClick={this.logout}>Logout</button>
+            <button className="btn btn-sm btn-danger" style={{marginTop:10, marginRight:20}} onClick={this.logout}>Logout</button>
           </li>
         </ul>
     </nav>
@@ -147,7 +147,7 @@ export default class Main extends Component {
                 </div>
                 <div className="row">
                     <h3>The {family.name} Family</h3>
-                    <p>{greeting()} {user.first_name}</p>
+                    <p>{greeting()} {user.first_name} <button className="btn btn-sm btn-primary">New Charge</button></p>
                 </div>
               </div>
             </div>
