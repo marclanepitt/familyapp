@@ -7,6 +7,8 @@ class Api {
   constructor() {
     this.uuid = Cookies.get("uuid") || "";
     this.user = {};
+    this.family = {};
+    this.fuuid = Cookies.get("fuuid") || "";
     this.apiVersion = "v1";
     this.url = "http://localhost:8000/api";
   }
@@ -41,7 +43,7 @@ class Api {
       .post(this.generateUrl("auth/registration/"), data)
       .then(response => {
         onSuccess(response);
-        this.store("fuuid",response.data.family);
+        this.store("fuuid",response.data.family.id);
       })
       .catch(err => {
         onError(err);
@@ -60,11 +62,12 @@ class Api {
       .post(this.generateUrl("auth/login/"), {}, config)
       .then(response => {
         this.user = response.data.user;
-        console.log(this.user);
         this.uuid = response.data.token;
+        this.store("fuuid", response.data.user.family.id);
         return onSuccess(response);
       })
       .catch(err => {
+          console.log(err);
         return onError(err);
       });
   }
@@ -102,8 +105,17 @@ class Api {
     }
   }
 
-  getUserProfiles() {
-
+  getFamily() {
+    if (isEmpty(this.family)) {
+        return axios.get(this.generateUrl("family/" + this.getFamilyID() +"/", "v1"), {
+            headers: this.generateTokenHeader()
+        }).then(response => {
+            this.family = response.data;
+            return this.family;
+        });
+    } else {
+        return this.family;
+    }
   }
 
   isAuthenticated() {

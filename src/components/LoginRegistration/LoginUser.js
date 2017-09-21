@@ -19,19 +19,36 @@ export default class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "",
+            userProfiles:{},
             password: "",
             errors: "",
+            family:"",
             error_display: "hide",
-            loading: ""
-
+            loading: true,
+            selectedUser:"",
+            showPasswordInput:false,
         };
+        this.selectedUser = this.selectedUser.bind(this);
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    componentDidMount() {
+  componentDidMount() {
+    if (Api.isAuthenticated()) {
+      Promise.resolve(Api.getFamily()).then(response => {
+        this.setState({
+          userProfiles: response[0].users,
+          loading: false
+        });
+      });
+    } else {
+      this.props.router.push("/login");
+    }
+  }
 
+    selectedUser(user) {
+        this.setState({selectedUser:user.first_name});
+        this.setState({showPasswordInput:true});
     }
 
     handleInputChange(e, field) {
@@ -62,82 +79,61 @@ export default class Login extends Component {
             this.setState({ error_display:""});
         };
         const response = Api.loginUser(data, onSuccess, onError);
-        // Successful path
-        // redirect to home page, store that token and the cookie
 
-        // Error path
-        // inactive account, invalid username pass
-        // check if errors
         this.setState({ errors: response.data });
         return false;
     }
 
     render() {
-        const { username, password, errors, loading } = this.state;
+        const { username, password, errors, loading,userProfiles,selectedUser,showPasswordInput } = this.state;
         return (
-            <div>
-                <div
-                    className="overlay"
-                    style={{ display: loading ? "block" : "none" }}
-                >
-                    <div className="loader" />
-                </div>
-                <br />
-                <div className="login-div">
-                    <div className="text-center">
-                        <br />
-                        <div className="title-div">
-                            <h1> Login </h1>
-                        </div>
-                    </div>
-                    <div className="inner-div">
-                      <Alert bsStyle="danger" className = {this.state.error_display}>
-                        <strong>Oops!</strong> {this.state.errors}
-                      </Alert>
-                        <br />
-                        <form
-                            className="login-form"
-                            onSubmit={this.handleOnSubmit}
-                        >
-                            <FormGroup
-                                controlId="username"
-                            >
-                                <FormControl
-                                    type="text"
-                                    placeholder="Enter Email"
-                                    onChange={e =>
-                                        this.handleInputChange(e, "username")}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                            <FormGroup
+            <div className="App">
+      {loading ?
+        <div
+            className="overlay"
+            style={{ display: loading ? "block" : "none" }}
+        >
+            <div className="loader" />
+        </div>
+        :
+          <div>
+              <h1> Please Select A Profile </h1>
+              <div className="row">
+              {userProfiles.map((user)=>
+                  <div className="col-md-2">
+                     <div onClick={() => this.selectedUser(user)} className="ratio img-responsive img-circle" style={{backgroundImage : "url("+user.pro_pic+")"}}/>
+                      <p>{user.first_name}</p>
+                  </div>
+              )}
+              </div>
+                <h1>{selectedUser}</h1>
+              {showPasswordInput ?
+                  <div className="col col-sm-2 col-md-offset-5">
+                    <form>
+                         <FormGroup
                                 controlId="password"
                             >
                                 <FormControl
                                     type="password"
-                                    placeholder="Enter Password"
+                                    placeholder="4-digit Passcode"
                                     onChange={e =>
                                         this.handleInputChange(e, "password")}
                                 />
                                 <FormControl.Feedback />
                             </FormGroup>
-                            <div className="text-center">
+                        <div className="text-center">
                                 <Button bsStyle={"primary"} type="submit">
                                     Login
                                 </Button>
                             </div>
-                        </form>
-                        <div className="text-center">
-                            <br />
-                            <br />
-                            <p>
-                                {" "}Don't have an account? Sign up{" "}
-                                <Link to="register"> here!</Link>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    </form>
+                  </div>
+                  :
+                  <div></div>
+              }
+          </div>
+      }
+      </div>
         );
     }
 }

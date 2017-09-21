@@ -44,7 +44,6 @@ export default class Main extends Component {
           user: response,
           loading: false
         });
-              console.log(response)
 
       });
     } else {
@@ -141,6 +140,7 @@ export default class Main extends Component {
         <div id="main-wrapper" className="col-md-11 pull-right">
             <div id="main">
               <div className="family-header">
+                  {user.first_name}
                 <button onClick={this.logout}>Logout</button>
               </div>
             </div>
