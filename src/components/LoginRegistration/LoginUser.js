@@ -37,6 +37,7 @@ export default class Login extends Component {
     if (Api.isAuthenticated()) {
       Promise.resolve(Api.getFamily()).then(response => {
         this.setState({
+          family: response,
           userProfiles: response[0].users,
           loading: false
         });
@@ -47,7 +48,7 @@ export default class Login extends Component {
   }
 
     selectedUser(user) {
-        this.setState({selectedUser:user.first_name});
+        this.setState({selectedUser:user.id});
         this.setState({showPasswordInput:true});
     }
 
@@ -62,15 +63,16 @@ export default class Login extends Component {
         e.stopPropagation();
         this.setState({ error_display: "hide"});
         this.setState({ loading: "overlay" });
-        const { username, password } = this.state;
+        const { selectedUser, password } = this.state;
         const data = {
-            username,
+            "id":selectedUser,
             password
         };
         const onSuccess = response => {
-            const { token, user } = response.data;
-            Api.store("uuid", token);
-            this.props.router.push("/app");
+            this.props.router.push({pathname: "/app",state : {
+                upid : selectedUser,
+                family: this.state.family,
+            }});
         };
 
         const onError = err => {
@@ -78,7 +80,7 @@ export default class Login extends Component {
             this.setState({ errors: err.response.data.detail });
             this.setState({ error_display:""});
         };
-        const response = Api.loginUser(data, onSuccess, onError);
+        const response = Api.loginUserProfile(data,onSuccess, onError,selectedUser);
 
         this.setState({ errors: response.data });
         return false;
@@ -109,7 +111,7 @@ export default class Login extends Component {
                 <h1>{selectedUser}</h1>
               {showPasswordInput ?
                   <div className="col col-sm-2 col-md-offset-5">
-                    <form>
+                    <form onSubmit={this.handleOnSubmit}>
                          <FormGroup
                                 controlId="password"
                             >

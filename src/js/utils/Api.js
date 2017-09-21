@@ -9,6 +9,7 @@ class Api {
     this.user = {};
     this.family = {};
     this.fuuid = Cookies.get("fuuid") || "";
+    this.upid = Cookies.get("upid") || "";
     this.apiVersion = "v1";
     this.url = "http://localhost:8000/api";
   }
@@ -80,15 +81,40 @@ class Api {
       .then(response => {
         this.user = {};
         this.uuid = "";
+        this.upid = "";
+        this.fuuid = "";
         Cookies.remove('uuid');
+        Cookies.remove('upid');
+        Cookies.remove('fuuid');
       })
       .catch(err => {
         console.error(err);
       });
   }
 
+  loginUserProfile(data,onSuccess,onError,id) {
+      return axios
+      .post(this.generateUrl("users/login/"+id,"v1"), data, {
+        headers: this.generateTokenHeader()
+      })
+      .then(response => {
+        return onSuccess(response);
+      })
+      .catch(err => {
+        return onError(err);
+      });
+  }
+
   store(name, data) {
     Cookies.set(name, data, { expires: 10 / 24 });
+  }
+
+  removeCookie(name) {
+    Cookies.remove(name);
+  }
+
+  getCookie(name) {
+    Cookies.get(name);
   }
 
   getUser() {
@@ -116,6 +142,21 @@ class Api {
     } else {
         return this.family;
     }
+
+
+  }
+
+  getUserProfile(upid) {
+    return axios
+      .get(this.generateUrl("users/list/"+upid,"v1"), {
+        headers: this.generateTokenHeader()
+      })
+      .then(response => {
+        return response.data[0];
+      })
+      .catch(err => {
+        return err;
+      });
   }
 
   isAuthenticated() {

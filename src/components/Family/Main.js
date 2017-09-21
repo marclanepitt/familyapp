@@ -31,6 +31,7 @@ export default class Main extends Component {
     super(props);
     this.state = {
       user: {},
+      family:{},
       loading: true
     };
     this.logout = this.logout.bind(this);
@@ -38,13 +39,15 @@ export default class Main extends Component {
   }
 
   componentDidMount() {
+    var upid =  this.props.location.state.upid;
+    var family = this.props.location.state.family;
     if (Api.isAuthenticated()) {
-      Promise.resolve(Api.getUser()).then(response => {
-        this.setState({ 
+      Promise.resolve(Api.getUserProfile(upid)).then(response => {
+        this.setState({
           user: response,
+          family: family[0],
           loading: false
         });
-
       });
     } else {
       this.props.router.push("/login");
@@ -73,7 +76,7 @@ export default class Main extends Component {
   }
 
   render() {
-    const { user,loading } = this.state;
+    const { user,loading,family } = this.state;
     const greeting = this.greeting;
 
     return (
@@ -99,19 +102,16 @@ export default class Main extends Component {
     <nav className="collapse navbar-collapse">
         <ul className="nav navbar-nav">
             <li>
-                <a href="#">Navbar Item 1</a>
-            </li>
-            <li className="dropdown">
-              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Navbar Item 2<b className="caret"></b></a>
-                <ul className="dropdown-menu">
-                    <li><a href="#">Navbar Item2 - Sub Item 1</a></li>
-                </ul>
+                <a href="#">My Profile</a>
             </li>
             <li>
-                <a href="#">Navbar Item 3</a>
+                <a href="#">My Family</a>
             </li>
         </ul>
         <ul className="nav navbar-nav pull-right">
+          <li>
+            <button onClick={this.logout}>Logout</button>
+          </li>
         </ul>
     </nav>
 </div>
@@ -120,16 +120,16 @@ export default class Main extends Component {
             <div id="sidebar">
                 <ul className="nav list-group">
                     <li>
-                      <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 1</a>
+                      <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Finances</a>
                     </li>
                     <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 2</a>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Chores</a>
                     </li>
                     <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 9</a>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Events</a>
                     </li>
                     <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 10</a>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Pets</a>
                     </li>
                     <li>
                         <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 11</a>
@@ -140,8 +140,15 @@ export default class Main extends Component {
         <div id="main-wrapper" className="col-md-11 pull-right">
             <div id="main">
               <div className="family-header">
-                  {user.first_name}
-                <button onClick={this.logout}>Logout</button>
+                <div className = "row">
+                  <div className="col-md-2 col-md-offset-5" style={{paddingTop:15}}>
+                       <div className="ratio img-responsive img-circle" style={{backgroundImage : "url("+family.pro_pic+")"}}/>
+                  </div>
+                </div>
+                <div className="row">
+                    <h3>The {family.name} Family</h3>
+                    <p>{greeting()} {user.first_name}</p>
+                </div>
               </div>
             </div>
           
