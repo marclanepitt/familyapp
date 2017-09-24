@@ -7,9 +7,8 @@ class Api {
   constructor() {
     this.uuid = Cookies.get("uuid") || "";
     this.user = {};
-    this.family = {};
-    this.fuuid = Cookies.get("fuuid") || "";
-    this.upid = Cookies.get("upid") || "";
+    this.userProfile = {};
+    this.upid = Cookies.get("upid");
     this.apiVersion = "v1";
     this.url = "http://localhost:8000/api";
   }
@@ -44,16 +43,12 @@ class Api {
       .post(this.generateUrl("auth/registration/"), data)
       .then(response => {
         onSuccess(response);
-        this.store("fuuid",response.data.family.id);
       })
       .catch(err => {
         onError(err);
       });
   }
 
-  getFamilyID() {
-    return Cookies.get("fuuid") || "";
-  }
 
   loginUser(data, onSuccess, onError) {
     const config = {
@@ -64,11 +59,9 @@ class Api {
       .then(response => {
         this.user = response.data.user;
         this.uuid = response.data.token;
-        this.store("fuuid", response.data.user.family.id);
         return onSuccess(response);
       })
       .catch(err => {
-          console.log(err);
         return onError(err);
       });
   }
@@ -82,10 +75,8 @@ class Api {
         this.user = {};
         this.uuid = "";
         this.upid = "";
-        this.fuuid = "";
         Cookies.remove('uuid');
         Cookies.remove('upid');
-        Cookies.remove('fuuid');
       })
       .catch(err => {
         console.error(err);
@@ -131,20 +122,6 @@ class Api {
     }
   }
 
-  getFamily() {
-    if (isEmpty(this.family)) {
-        return axios.get(this.generateUrl("family/" + this.getFamilyID() +"/", "v1"), {
-            headers: this.generateTokenHeader()
-        }).then(response => {
-            this.family = response.data;
-            return this.family;
-        });
-    } else {
-        return this.family;
-    }
-
-
-  }
 
   getUserProfile(upid) {
     return axios
@@ -152,6 +129,7 @@ class Api {
         headers: this.generateTokenHeader()
       })
       .then(response => {
+        this.userProfile = response.data[0];
         return response.data[0];
       })
       .catch(err => {
@@ -161,6 +139,10 @@ class Api {
 
   isAuthenticated() {
     return this.uuid !== "";
+  }
+
+  setUser(user) {
+    this.user = user;
   }
 
 }

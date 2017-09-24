@@ -10,7 +10,7 @@ import Registration from "./components/LoginRegistration/Registration";
 import Main from "./components/Family/Main"
 import Dashboard from "./components/Family/Dashboard"
 import Profile from "./components/Family/Profile"
-import Request from "./components/Family/Request"
+import Finances from "./components/Family/Finances"
 import registerServiceWorker from "./js/registerServiceWorker";
 import "./css/index.css";
 import "bootstrap/dist/css/bootstrap.css";
@@ -25,8 +25,8 @@ ReactDOM.render(
             <Route path = "email" component={Email}/>
             <Route path = "app" component={Main}>
                 <IndexRoute component={Dashboard}/>
-                <Route path = "profile" component={Profile}/>
-                <Route path = "request" component={Request}/>
+                <Route path = "myprofile" component={Profile}/>
+                <Route path = "finances" component={Finances}/>
             </Route>
         </Route>
     </Router>,

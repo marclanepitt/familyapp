@@ -26,6 +26,7 @@ export default class Login extends Component {
             error_display: "hide",
             loading: true,
             selectedUser:"",
+            selectedPic:"",
             showPasswordInput:false,
         };
         this.selectedUser = this.selectedUser.bind(this);
@@ -33,22 +34,25 @@ export default class Login extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
+
   componentDidMount() {
-    if (Api.isAuthenticated()) {
-      Promise.resolve(Api.getFamily()).then(response => {
-        this.setState({
-          family: response,
-          userProfiles: response[0].users,
-          loading: false
-        });
-      });
-    } else {
+      if (Api.isAuthenticated()) {
+          Promise.resolve(Api.getUser()).then(response=> {
+              Api.setUser(response);
+              this.setState({
+                  family: response.family,
+                  userProfiles: response.family.users,
+                  loading:false,
+              });
+          });
+      } else {
       this.props.router.push("/login");
     }
   }
 
     selectedUser(user) {
         this.setState({selectedUser:user.id});
+        this.setState({selectedPic:user.pro_pic});
         this.setState({showPasswordInput:true});
     }
 
@@ -69,11 +73,9 @@ export default class Login extends Component {
             password
         };
         const onSuccess = response => {
-            this.props.router.push({pathname: "/app",state : {
-                upid : selectedUser,
-                family: this.state.family,
-            }});
-        };
+            Api.store("upid",selectedUser);
+            this.props.router.push("/app");
+        }
 
         const onError = err => {
             this.setState({ loading: "" });
@@ -87,7 +89,7 @@ export default class Login extends Component {
     }
 
     render() {
-        const { username, password, errors, loading,userProfiles,selectedUser,showPasswordInput } = this.state;
+        const { username, password, errors, loading,userProfiles,selectedUser,showPasswordInput,selectedPic } = this.state;
         return (
             <div className="App">
       {loading ?
@@ -99,25 +101,31 @@ export default class Login extends Component {
         </div>
         :
           <div>
+              <div className="row">
+               <div className="left col col-sm-6">
+                    <h1 style={{marginTop:200}}>Add Images and whatever of all the stuff the app can do here</h1>
+                </div>
+                  <div className="right col col-sm-6">
               <h1> Please Select A Profile </h1>
               <div className="row">
               {userProfiles.map((user)=>
                   <div className="col-md-2">
                      <div onClick={() => this.selectedUser(user)} className="ratio img-responsive img-circle" style={{backgroundImage : "url("+user.pro_pic+")"}}/>
-                      <p>{user.first_name}</p>
+                      <h4>{user.first_name}</h4>
                   </div>
               )}
               </div>
-                <h1>{selectedUser}</h1>
-              {showPasswordInput ?
+                      {showPasswordInput ?
                   <div className="col col-sm-2 col-md-offset-5">
+                      <div className="ratio img-responsive img-circle" style={{backgroundImage : "url("+selectedPic+")"}}/>
+                      <br/>
                     <form onSubmit={this.handleOnSubmit}>
                          <FormGroup
                                 controlId="password"
                             >
                                 <FormControl
                                     type="password"
-                                    placeholder="4-digit Passcode"
+                                    placeholder="Passcode"
                                     onChange={e =>
                                         this.handleInputChange(e, "password")}
                                 />
@@ -133,6 +141,8 @@ export default class Login extends Component {
                   :
                   <div></div>
               }
+                  </div>
+          </div>
           </div>
       }
       </div>

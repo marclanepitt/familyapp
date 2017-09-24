@@ -2,15 +2,53 @@ body {
     overflow: hidden;
 }
 
+.list-group-item:hover {
+	cursor: pointer;
+	transform: scale(1.2);
+}
+
+.list-group-item{
+    transition: all .2s ease-in-out;
+    font-family: "Sigmar One";
+
+}
+
+.list-group-focus{
+    background-color: #1b6d85 !important;
+}
+
+.test {
+    font-family: "Sigmar One";
+
+}
+
+.board {
+    height: 50vh;
+    width: 120%;
+    overflow-x:hidden;
+    margin-left: -5%;
+    overflow-y: auto;
+}
+
+
+.small-image {
+    max-height: 50px;
+    max-width: 50px;
+}
+
+.inner-board {
+    margin-top: .8%;
+    background-color: gainsboro;
+    height: 47vh;
+}
 .navbar {
     background-color: whitesmoke;
     opacity:1 !important;
 }
 .family-header {
     margin-left: -16px;
-    width:103%;
-    height:47%;
-    background-color:gainsboro;
+    width: 103%;
+    height: 47%;
 }
 #wrapper {
     min-height: 100%;
@@ -43,12 +81,14 @@ body {
     position: relative;
     height: 100%;
     overflow:hidden;
+    background-color: whitesmoke;
 }
 #sidebar .list-group-item {
         border-radius: 0;
         border-left: 0;
         border-right: 0;
         border-top: 0;
+    background-color: whitesmoke;
 }
 @media (max-width: 992px) {
     body {

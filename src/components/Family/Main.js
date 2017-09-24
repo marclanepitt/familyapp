@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Link } from "react-router";
 import ApiInstance from "../../js/utils/Api";
-import Profile from "./Profile.js";
+import Cookies from "js-cookie";
 import "./css/main.css";
 import {
+  Modal,
   Button,
   Col,
   Row,
@@ -13,15 +14,10 @@ import {
   NavDropdown,
   MenuItem
 } from "react-bootstrap";
-import {List, ListItem} from 'material-ui/List';
-import ActionInfo from 'material-ui/svg-icons/action/info';
-import Divider from 'material-ui/Divider';
-import Subheader from 'material-ui/Subheader';
-import Avatar from 'material-ui/Avatar';
-import FileFolder from 'material-ui/svg-icons/file/folder';
-import ActionAssignment from 'material-ui/svg-icons/action/assignment';
-import {blue500, yellow600} from 'material-ui/styles/colors';
-import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart';
+import dashPic from "./img/home.png";
+import choresPic from "./img/chores.png";
+import calPic from "./img/cal.png";
+import financePic from "./img/finance.png";
 
 const Api = ApiInstance.instance;
 
@@ -32,21 +28,31 @@ export default class Main extends Component {
     this.state = {
       user: {},
       family:{},
-      loading: true
+      loading: true,
+        showLogoutModal:false,
     };
     this.logout = this.logout.bind(this);
     this.greeting = this.greeting.bind(this);
+    this.closeLogoutModal =this.closeLogoutModal.bind(this);
+    this.openLogoutModal=this.openLogoutModal.bind(this);
+  }
+
+  componentWillMount() {
+      Promise.resolve(Api.getUser()).then(response=> {
+        Api.setUser(response);
+        this.setState({
+            loading:false,
+        })
+      });
   }
 
   componentDidMount() {
-    var upid =  this.props.location.state.upid;
-    var family = this.props.location.state.family;
+    var upid =  Cookies.get("upid");
     if (Api.isAuthenticated()) {
       Promise.resolve(Api.getUserProfile(upid)).then(response => {
         this.setState({
           user: response,
-          family: family[0],
-          loading: false
+          family: Api.user.family,
         });
       });
     } else {
@@ -60,6 +66,18 @@ export default class Main extends Component {
       this.setState({ user: {} });
 
     });
+  }
+
+  closeLogoutModal() {
+    this.setState({
+        showLogoutModal:false,
+    })
+  }
+
+  openLogoutModal() {
+    this.setState({
+        showLogoutModal:true,
+    })
   }
 
   greeting() {
@@ -101,16 +119,21 @@ export default class Main extends Component {
     </div>
     <nav className="collapse navbar-collapse">
         <ul className="nav navbar-nav">
-            <li>
-                <a href="#">My Profile</a>
-            </li>
-            <li>
-                <a href="#">My Family</a>
-            </li>
+            {/*<li>*/}
+                {/*<Link to="/app/myprofile/">My Profile</Link>*/}
+            {/*</li>*/}
+            {/*<li>*/}
+                {/*<a href="#">My Family</a>*/}
+            {/*</li>*/}
+          {/*<li style={{marginTop:15,marginLeft:697}}>*/}
+              {/*{greeting()} {user.first_name}*/}
+      {/*</li>*/}
         </ul>
+
+
         <ul className="nav navbar-nav pull-right">
           <li>
-            <button className="btn btn-sm btn-danger" style={{marginTop:10, marginRight:20}} onClick={this.logout}>Logout</button>
+            <button className="btn btn-sm btn-danger" style={{marginTop:10, marginRight:20}} onClick={this.openLogoutModal}>Logout</button>
           </li>
         </ul>
     </nav>
@@ -119,39 +142,45 @@ export default class Main extends Component {
   <div id="sidebar-wrapper" className="col-md-1">
             <div id="sidebar">
                 <ul className="nav list-group">
+                  <li>
+                    <div className="small-img ratio img-responsive img-circle" style={{marginTop:10, backgroundImage : "url("+user.pro_pic+")"}}/>
+                  </li>
+                  <br/>
                     <li>
-                      <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Finances</a>
+                      <Link to="/app/" className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={dashPic}/> Living Room </Link>
                     </li>
                     <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Chores</a>
+                      <Link className="list-group-item" to="/app/finances/"><i className="icon-home icon-1x"></i><img src={financePic}/>Finances </Link>
                     </li>
                     <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Events</a>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={choresPic}/>Chores</a>
                     </li>
                     <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Pets</a>
-                    </li>
-                    <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i>Sidebar Item 11</a>
+                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={calPic}/>Events</a>
                     </li>
                 </ul>
             </div>
         </div>
         <div id="main-wrapper" className="col-md-11 pull-right">
-            <div id="main">
-              <div className="family-header">
-                <div className = "row">
-                  <div className="col-md-2 col-md-offset-5" style={{paddingTop:15}}>
-                       <div className="ratio img-responsive img-circle" style={{backgroundImage : "url("+family.pro_pic+")"}}/>
-                  </div>
-                </div>
-                <div className="row">
-                    <h3>The {family.name} Family</h3>
-                    <p>{greeting()} {user.first_name} <button className="btn btn-sm btn-primary">New Charge</button></p>
-                </div>
-              </div>
+          <Modal show={this.state.showLogoutModal} onHide={this.closeLogoutModal}>
+          <Modal.Header closeButton>
+            <div className="text-center">
+            <Modal.Title>Confirmation</Modal.Title>
             </div>
-          
+          </Modal.Header>
+            <Modal.Body>
+              <div className="text-center">
+              Are you sure you want to log out?
+              </div>
+            </Modal.Body>
+          <Modal.Footer>
+            <div className="text-center">
+              <Button bsStyle={"danger"} onClick={this.logout}>Yes</Button>
+              <Button bsStyle={"primary"} onClick={this.closeLogoutModal}>No</Button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+            {this.props.children}
         </div>
 </div>
           </div>
