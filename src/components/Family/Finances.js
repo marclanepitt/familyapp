@@ -18,32 +18,62 @@ export default class Finances extends Component {
     constructor(props) {
     super(props);
     this.state = {
-      userProfile: {},
-      family:{},
+      userProfile: Api.userProfile,
+      family:Api.user.family,
+      charges:{},
+      userCharges:[],
+        loadingFinances:true,
     };
   }
 
   componentDidMount() {
-    this.setState({
-      family:Api.user.family,
-      userProfile:Api.userProfile,
-    });
+        Promise.resolve(Api.getCharges()).then(response => {
+            var userCharges = [];
+            for(var i =0; i < response.length; i++) {
+                if(response[i].created_by.id == this.state.userProfile.id) {
+                    userCharges.push(response[i]);
+                }
+            }
+            this.setState({
+                charges: response,
+                loadingFinances:false,
+                userCharges:userCharges,
+            })
+        });
   }
 
+
   render() {
-      const {family,userProfile} = this.state;
+      const {charges,family,userProfile,userCharges,loadingFinances} = this.state;
     return (
       <div className="container">
-        <br/>
-        <h1> Finances </h1>
-        <div className="row">
-          <div className="col col-sm-6">
-          <h3>{userProfile.first_name}'s Finances</h3>
-        </div>
-          <div className="col col-sm-6">
-            <h3>{family.name}'s Finances</h3>
-          </div>
-        </div>
+          {loadingFinances ?
+              <div
+                  className="overlay"
+                  style={{display: loadingFinances ? "block" : "none"}}
+              >
+                  <div className="loader"/>
+              </div>
+              :
+              <div>
+                  <br/>
+                  <h1> Finances </h1>
+                  <div className="row">
+                      <div className="col col-sm-6">
+                          <h3>{userProfile.first_name}'s Finances</h3>
+                             {userCharges.map((charge)=>
+                                 <h4>{charge.description}</h4>
+                              )}
+                      </div>
+                      <div className="col col-sm-6">
+                          <h3>{family.name}'s Finances</h3>
+                           {charges.map((charge)=>
+                                 <h4>{charge.description}</h4>
+                              )}
+                      </div>
+                  </div>
+              </div>
+          }
       </div>
     );
   }

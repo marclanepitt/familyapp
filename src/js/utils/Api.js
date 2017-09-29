@@ -145,6 +145,45 @@ class Api {
     this.user = user;
   }
 
+  getCharges() {
+    return axios
+        .get(this.generateUrl("finances/charges/"+this.user.family.id,"v1"), {
+          headers: this.generateTokenHeader()
+        })
+        .then(response => {
+          return response.data
+        })
+        .catch(err => {
+          return err;
+        })
+  }
+
+  createCharge(data, onSuccess, onError) {
+    return axios
+        .post(this.generateUrl("finances/charges/create/"+this.user.family.id,"v1"),data, {
+          headers: this.generateTokenHeader()
+        })
+        .then(response => {
+          return onSuccess(response);
+        })
+        .catch(err => {
+          return onError(err);
+        })
+  }
+
+  getPosts() {
+    return axios
+        .get(this.generateUrl("posts/"+this.user.family.id,"v1"), {
+          headers: this.generateTokenHeader()
+      })
+        .then(response=> {
+          return response.data;
+        })
+        .catch(err => {
+          return err;
+        })
+  }
+
 }
 export default class ApiInstance {
   static get instance() {

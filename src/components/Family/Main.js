@@ -30,11 +30,14 @@ export default class Main extends Component {
       family:{},
       loading: true,
         showLogoutModal:false,
+        selectedMenu:0,
     };
     this.logout = this.logout.bind(this);
     this.greeting = this.greeting.bind(this);
     this.closeLogoutModal =this.closeLogoutModal.bind(this);
     this.openLogoutModal=this.openLogoutModal.bind(this);
+    this.menuColor = this.menuColor.bind(this)
+    this.selectedMenu = this.selectedMenu.bind(this);
   }
 
   componentWillMount() {
@@ -93,6 +96,21 @@ export default class Main extends Component {
     return greeting;
   }
 
+ selectedMenu(position){
+    if (this.state.selectedMenu === position) {
+      this.setState({selectedMenu : null})
+    } else {
+      this.setState({selectedMenu : position})
+    }
+  }
+
+  menuColor(position) {
+    if (this.state.selectedMenu === position) {
+      return "lightgrey";
+    }
+    return "";
+  }
+
   render() {
     const { user,loading,family } = this.state;
     const greeting = this.greeting;
@@ -146,17 +164,17 @@ export default class Main extends Component {
                     <div className="small-img ratio img-responsive img-circle" style={{marginTop:10, backgroundImage : "url("+user.pro_pic+")"}}/>
                   </li>
                   <br/>
-                    <li>
-                      <Link to="/app/" className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={dashPic}/> Living Room </Link>
+                    <li >
+                      <Link style={{backgroundColor: this.menuColor(0)}} onClick={() => this.selectedMenu(0)} to="/app/" className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={dashPic}/> Living Room </Link>
+                    </li>
+                    <li >
+                      <Link style={{backgroundColor: this.menuColor(1)}} onClick={() => this.selectedMenu(1)} className="list-group-item" to="/app/finances/"><i className="icon-home icon-1x"></i><img src={financePic}/>Finances </Link>
                     </li>
                     <li>
-                      <Link className="list-group-item" to="/app/finances/"><i className="icon-home icon-1x"></i><img src={financePic}/>Finances </Link>
+                        <a  style={{backgroundColor: this.menuColor(2)}} onClick={() => this.selectedMenu(2)} className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={choresPic}/>Chores</a>
                     </li>
-                    <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={choresPic}/>Chores</a>
-                    </li>
-                    <li>
-                        <a className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={calPic}/>Events</a>
+                    <li >
+                        <a style={{backgroundColor: this.menuColor(3)}} onClick={() => this.selectedMenu(3)} className="list-group-item" href="#"><i className="icon-home icon-1x"></i><img src={calPic}/>Events</a>
                     </li>
                 </ul>
             </div>

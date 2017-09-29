@@ -1,6 +1,27 @@
 body {
-    overflow: hidden;
+    overflow: hidden !important;
 }
+
+
+.post-background {
+    background-color: whitesmoke;
+    border: solid 2px lightgrey;
+    box-shadow: 3px 3px 2px #888888;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    height:8vh;
+}
+
+.post-text{
+    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+    font-size: 30px;
+    float:left;
+}
+.post-image {
+    margin-top: 3%;
+    padding-bottom: 90%;
+}
+
 
 .list-group-item:hover {
 	cursor: pointer;
@@ -23,11 +44,12 @@ body {
 }
 
 .board {
-    height: 50vh;
+    height: 47vh;
     width: 120%;
     overflow-x:hidden;
     margin-left: -5%;
-    overflow-y: auto;
+    background-color: #e8e8e8;
+
 }
 
 
@@ -37,9 +59,8 @@ body {
 }
 
 .inner-board {
-    margin-top: .8%;
-    background-color: gainsboro;
-    height: 47vh;
+    margin-top: .1%;
+    height: 48vh;
 }
 .navbar {
     background-color: whitesmoke;
