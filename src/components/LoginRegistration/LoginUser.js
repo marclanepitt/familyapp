@@ -11,6 +11,7 @@ import {
     HelpBlock,
     Alert
 } from "react-bootstrap";
+import {GridLoader} from "react-spinners";
 import ApiInstance from "../../js/utils/Api";
 
 const Api = ApiInstance.instance;
@@ -66,7 +67,7 @@ export default class Login extends Component {
         e.preventDefault();
         e.stopPropagation();
         this.setState({ error_display: "hide"});
-        this.setState({ loading: "overlay" });
+        this.setState({ loading: true });
         const { selectedUser, password } = this.state;
         const data = {
             "id":selectedUser,
@@ -93,11 +94,11 @@ export default class Login extends Component {
         return (
             <div className="App">
       {loading ?
-        <div
-            className="overlay"
-            style={{ display: loading ? "block" : "none" }}
-        >
-            <div className="loader" />
+        <div className = "loader">
+            <GridLoader
+          color={'#36d7b7'}
+          loading={loading}
+            />
         </div>
         :
           <div>

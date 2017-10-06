@@ -15,16 +15,14 @@ body {
 }
 
 .loader {
-    border-top: 16px solid #99badd;
-    border-right: 16px solid #99badd;
-    border-bottom: 16px solid #f75d5d;
-    border-left: 16px solid #f75d5d;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-    animation: spin 1.5s linear infinite;
-    white-space: normal;
-    margin  : 10px auto;
+   position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
 }
 
 @keyframes spin {
@@ -41,7 +39,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,0.7);
+    background-color: rgba(0,0,0,0);
     z-index: 2;
 }
 

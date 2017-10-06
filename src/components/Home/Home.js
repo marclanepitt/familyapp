@@ -8,8 +8,10 @@ import {
   Nav,
   NavItem
 } from "react-bootstrap";
+import {Icon} from 'react-fa';
+
 var Scroll  = require('react-scroll');
- 
+
 var ScrollLink       = Scroll.Link;
 var Element    = Scroll.Element;
 var Events     = Scroll.Events;
@@ -53,50 +55,7 @@ export default class Home extends Component {
   render() {
     return (
       <div className="Home">
-        <img src="../img/home-bg.jpg" className="hidden" />
-        <div className="top">
-          <Navbar>
-            <Navbar.Header>
-              <Navbar.Brand>
-                <a href="#">Family</a>
-              </Navbar.Brand>
-              <Navbar.Toggle />
-            </Navbar.Header>
-            <Nav>
-
-              <NavItem ><ScrollLink activeClass="active" to="about" spy={true} smooth={true} offset={-50} duration={800}>About
-        </ScrollLink></NavItem>
-              <NavItem ><ScrollLink activeClass="active" to="contact" spy={true} smooth={true} offset={-50} duration={800}>Contact
-        </ScrollLink></NavItem>
-            </Nav>
-            <Navbar.Collapse>
-              <Navbar.Form pullRight>
-                <Link to = "login"><Button type="submit">Log In</Button></Link>
-              </Navbar.Form>
-            </Navbar.Collapse>
-          </Navbar>
-          <br />
-          <br />
-          <div className="text-center">
-            <Col xs={2} xsOffset={5}>
-              <div className="circle-element">
-                hoi
-              </div>
-              <br />
-              <br />
-              <Link to = "register"><Button bsStyle={"primary"} bsSize={"large"}>Get Started</Button></Link>
-            </Col>
-          </div>
-        </div>
-        <Element name = 'about' className = 'element'>
-        <div className = 'about-section'>
-
-        </div>
-        </Element>
-        <Element name = 'contact' className = 'element'>
-        <div className = 'contact-section'>
-        </div>
-        </Element>
+        Home
       </div>
     );
   }

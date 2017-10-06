@@ -184,6 +184,19 @@ class Api {
         })
   }
 
+  createPet(data, onSuccess, onError) {
+    return axios
+        .post(this.generateUrl("pets/create/"+this.user.family.id,"v1"),data, {
+          headers: this.generateTokenHeader()
+        })
+        .then(response => {
+          return onSuccess(response);
+        })
+        .catch(err => {
+          return onError(err);
+        })
+  }
+
 }
 export default class ApiInstance {
   static get instance() {

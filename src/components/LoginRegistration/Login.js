@@ -11,6 +11,7 @@ import {
     HelpBlock,
     Alert
 } from "react-bootstrap";
+import {GridLoader} from 'react-spinners';
 import ApiInstance from "../../js/utils/Api";
 
 const Api = ApiInstance.instance;
@@ -23,7 +24,7 @@ export default class Login extends Component {
             password: "",
             errors: "",
             error_display: "hide",
-            loading: ""
+            loading: false
 
         };
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
@@ -46,7 +47,7 @@ export default class Login extends Component {
         e.preventDefault();
         e.stopPropagation();
         this.setState({ error_display: "hide"});
-        this.setState({ loading: "overlay" });
+        this.setState({ loading: true });
         const { username, password } = this.state;
         const data = {
             username,
@@ -78,12 +79,6 @@ export default class Login extends Component {
         const { username, password, errors, loading } = this.state;
         return (
             <div>
-                <div
-                    className="overlay"
-                    style={{ display: loading ? "block" : "none" }}
-                >
-                    <div className="loader" />
-                </div>
                 <br />
                 <div className = "row">
                 <div className="left col col-sm-6">
@@ -96,40 +91,53 @@ export default class Login extends Component {
                         <br />
 
                         <div className="login-div col col-sm-4 col-md-offset-4 ">
-                            <h2>Family App </h2>
-                            <h4>Sign Into Your Account</h4>
-                        <form
-                            onSubmit={this.handleOnSubmit}
-                        >
-                            <FormGroup
-                                controlId="username"
-                            >
-                                <FormControl
-                                    type="text"
-                                    placeholder="Enter Email"
-                                    onChange={e =>
-                                        this.handleInputChange(e, "username")}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                            <FormGroup
-                                controlId="password"
-                            >
-                                <FormControl
-                                    type="password"
-                                    placeholder="Enter Password"
-                                    onChange={e =>
-                                        this.handleInputChange(e, "password")}
-                                />
-                                <FormControl.Feedback />
-                            </FormGroup>
-                            <div className="text-center">
-                                <Button bsStyle={"primary"} type="submit">
-                                    Login
-                                </Button>
-                            </div>
-                        </form>
+                            {loading ?
+                                <div
+                                    className="loader"
+                                >
+                                    <GridLoader
+                                        color={'#36d7b7'}
+                                        loading={loading}
+                                    />
+                                </div> :
+                                <div>
+                                    <h2>Family App </h2>
+                                    <h4>Sign Into Your Account</h4>
+                                    <form
+                                        onSubmit={this.handleOnSubmit}
+                                    >
+                                        <FormGroup
+                                            controlId="username"
+                                        >
+                                            <FormControl
+                                                type="text"
+                                                placeholder="Enter Email"
+                                                onChange={e =>
+                                                    this.handleInputChange(e, "username")}
+                                            />
+                                            <FormControl.Feedback/>
+                                        </FormGroup>
+                                        <FormGroup
+                                            controlId="password"
+                                        >
+                                            <FormControl
+                                                type="password"
+                                                placeholder="Enter Password"
+                                                onChange={e =>
+                                                    this.handleInputChange(e, "password")}
+                                            />
+                                            <FormControl.Feedback/>
+                                        </FormGroup>
+                                        <div className="text-center">
+                                            <Button bsStyle={"primary"} type="submit">
+                                                Login
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
                         </div>
+
                     </div>
                         <div className="text-center">
                             <p>

@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import ApiInstance from "../../js/utils/Api";
 import "./css/main.css";
-import { Button, Col, Navbar, Nav, NavItem, Row, Modal, FormGroup, FormControl } from "react-bootstrap";
+import { Button, Col, Navbar, Nav, NavItem, Row, Modal, FormGroup, FormControl, Image } from "react-bootstrap";
 import financePic from "./img/finance.png";
+import { GridLoader } from 'react-spinners';
+
 
 const Api = ApiInstance.instance;
 
@@ -94,24 +96,26 @@ export default class Dashboard extends Component {
     return (
       <div>
           {loading ?
-              <div
-                  className="overlay"
-                  style={{display: loading ? "block" : "none"}}
-              >
-                  <div className="loader"/>
-              </div>
+                <div className="loader"
+                >
+                  <GridLoader
+                  color={'#36d7b7'}
+                  loading={loading}
+                />
+                </div>
               :
               <div>
                   <div id="main">
-                      <div className="family-header" style={{backgroundImage: "url(" + family.cover_pic + ")"}}>
+                      <div className=" row family-header" style={{backgroundImage: "url(" + family.cover_pic + ")",paddingBottom:20}}>
                           <div className="row">
                               <div className="col-md-2 col-md-offset-5" style={{paddingTop: 15}}>
-                                  <div className="ratio img-responsive img-circle"
-                                       style={{backgroundImage: "url(" + family.pro_pic + ")"}}/>
+                                  <div className="image-border">
+                                    <Image id="family-pro-pic" src={family.pro_pic} circle responsive/>
+                                  </div>
                               </div>
                           </div>
-                          <div className="row" style={{marginBottom:10}}>
-                              <h3 className="test">The {family.name} Family</h3>
+                          <div className="row" >
+                              <br/>
                               <button onClick={this.openChargeModal} className="btn btn-sm btn-primary">New Charge
                               </button>
                               {'  '}
@@ -119,16 +123,50 @@ export default class Dashboard extends Component {
 
                           </div>
                       </div>
-
-                      <div className="board">
-                          <div className="inner-board col col-md-9 col-md-offset-1">
-                              <div className="board-element">
+                      <br/>
+                      <div className="row">
+                          <div className="inner-board col col-sm-4">
+                              <h4>Finances</h4>
+                              <div>
                                   {posts.map((post) =>
                                       <div className="post-background">
                                           <div>
                                               <div className="col col-sm-1">
-                                               <div className="ratio img-responsive img-circle post-image"
-                                                style={{backgroundImage: "url(" + post.charge.created_by.pro_pic + ")"}}/>
+                                                  <Image src={post.charge.created_by.pro_pic} circle responsive />
+                                              </div>
+                                              <div className="post-text">
+                                              {post.charge.created_by.first_name} spent ${post.charge.amount} at {post.charge.location}
+                                              </div>
+                                          </div>
+                                      </div>
+                                  )}
+                              </div>
+                          </div>
+                          <div className="inner-board col col-sm-4">
+                              <h4>Chores</h4>
+                              <div>
+                                  {posts.map((post) =>
+                                      <div className="post-background">
+                                          <div>
+                                              <div className="col col-sm-1">
+                                                  <Image src={post.charge.created_by.pro_pic} circle responsive />
+                                              </div>
+                                              <div className="post-text">
+                                              {post.charge.created_by.first_name} spent ${post.charge.amount} at {post.charge.location}
+                                              </div>
+                                          </div>
+                                      </div>
+                                  )}
+                              </div>
+                          </div>
+                          <div className="inner-board col col-sm-4">
+                              <h4>Events</h4>
+                              <div>
+                                  {posts.map((post) =>
+                                      <div className="post-background">
+                                          <div>
+                                              <div className="col col-sm-1">
+                                                  <Image src={post.charge.created_by.pro_pic} circle responsive />
                                               </div>
                                               <div className="post-text">
                                               {post.charge.created_by.first_name} spent ${post.charge.amount} at {post.charge.location}
