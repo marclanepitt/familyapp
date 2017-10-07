@@ -129,7 +129,7 @@ export default class Main extends Component {
               <div className="loader"
                 >
                   <GridLoader
-                  color={'#36d7b7'}
+                  color={'#102C58'}
                 />
                 </div>
               :
