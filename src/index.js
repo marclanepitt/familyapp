@@ -11,7 +11,10 @@ import Main from "./components/Family/Main";
 import Dashboard from "./components/Family/Dashboard";
 import Profile from "./components/Family/Profile";
 import Finances from "./components/Family/Finances";
+import Events from "./components/Family/Events";
 import Admin from "./components/Family/Admin";
+import Family from "./components/Family/Family";
+import Chores from "./components/Family/Chores";
 import registerServiceWorker from "./js/registerServiceWorker";
 import "./css/index.css";
 import "bootstrap/dist/css/bootstrap.css";
@@ -29,6 +32,9 @@ ReactDOM.render(
                 <Route path = "myprofile" component={Profile}/>
                 <Route path = "finances" component={Finances}/>
                 <Route path = "admin" component={Admin}/>
+                <Route path = "events" component={Events}/>
+                <Route path = "family" component={Family}/>
+                <Route path = "chores" component={Chores}/>
             </Route>
         </Route>
     </Router>,

@@ -96,7 +96,7 @@ export default class Dashboard extends Component {
     return (
       <div>
           {loading ?
-                <div className="loader"
+                <div className="col-sm-2 col-sm-offset-5 loader"
                 >
                   <GridLoader
                   color={'#102C58'}

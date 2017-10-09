@@ -1,17 +1,33 @@
-body {
-    overflow: hidden !important;
+
+
+.history-bundle {
+    padding-top: 3.5%;
+    font-weight: 900;
+
 }
 
+.point-display {
+    font-weight: 600;
+    font-size: 70px;
+    margin-top: -10px !important;
+}
 
+.chore-leaderboard {
+    height: 40vh!important;
+}
+.charge-panel-body {
+    overflow-y: scroll !important;
+    max-height: 45vh;
+}
 
 .card-base {
-    height: 15vh;
+    height: 12vh;
     width: 90%;
     border-radius: 3vh;
     margin: auto;
     box-shadow: 3px 3px 2px #888888;
     border-left: 15px #5bc0de solid;
-    margin-bottom: 2%;
+    margin-bottom: 3%;
 }
 
 .card-body-description {
@@ -44,7 +60,6 @@ body {
 .charge-list {
     height:60vh;
     max-height:60vh;
-    overflow-y: hidden;
 }
 
 .post-background {

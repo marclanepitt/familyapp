@@ -126,7 +126,7 @@ export default class Main extends Component {
     return (
       <div className="app">
           {loading ?
-              <div className="loader"
+                <div className="col-sm-2 col-sm-offset-5 loader"
                 >
                   <GridLoader
                   color={'#102C58'}
@@ -166,25 +166,25 @@ export default class Main extends Component {
                             className="fa fa-home"/>
                           <div className="c-menu-item__title"><span>Living Room</span></div>
                         </li></Link>
+                          <li className="c-menu__item" data-toggle="tooltip" title="Groups" onClick={(e) => this.selectedMenu(e)}><i
+                            className="fa fa-users"/>
+                          <div className="c-menu-item__title"><span>Groups</span></div>
+                        </li>
                         <Link to="/app/finances/"><li className="c-menu__item" data-toggle="tooltip" title="Finances" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-credit-card-alt"/>
                           <div className="c-menu-item__title"><span>Finances</span></div>
                         </li></Link>
-                        <li className="c-menu__item" data-toggle="tooltip" title="Events" onClick={(e) => this.selectedMenu(e)}><i
+                       <Link to="/app/events/"> <li className="c-menu__item" data-toggle="tooltip" title="Events" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-calendar-o"/>
                           <div className="c-menu-item__title"><span>Events</span></div>
-                        </li>
-                        <li className="c-menu__item" data-toggle="tooltip" title="Chores" onClick={(e) => this.selectedMenu(e)}><i className="fa fa-wrench"/>
+                       </li></Link>
+                       <Link to="/app/chores/"> <li className="c-menu__item" data-toggle="tooltip" title="Chores" onClick={(e) => this.selectedMenu(e)}><i className="fa fa-wrench"/>
                           <div className="c-menu-item__title"><span>Chores</span></div>
-                        </li>
-                        <li className="c-menu__item" data-toggle="tooltip" title="My Family" onClick={(e) => this.selectedMenu(e)}><i
+                       </li></Link>
+                         <Link to="/app/family/"><li className="c-menu__item" data-toggle="tooltip" title="My Family" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-pagelines"/>
                           <div className="c-menu-item__title"><span>My Family</span></div>
-                        </li>
-                        <li className="c-menu__item" data-toggle="tooltip" title="Groups" onClick={(e) => this.selectedMenu(e)}><i
-                            className="fa fa-users"/>
-                          <div className="c-menu-item__title"><span>Groups</span></div>
-                        </li>
+                         </li></Link>
                         <li className="c-menu__item" data-toggle="tooltip" title="Settings" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-cogs"/>
                           <div className="c-menu-item__title"><span>Settings</span></div>

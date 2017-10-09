@@ -13,6 +13,8 @@ import {
   ProgressBar,
   Popover,
   OverlayTrigger,
+  Pager,
+
 
 } from "react-bootstrap";
 import { GridLoader } from 'react-spinners';
@@ -70,13 +72,15 @@ export default class Finances extends Component {
     return (
       <div className="container">
           {loadingFinances ?
-                <div className="loader"
+              <div className="row">
+                <div className="col-sm-2 col-sm-offset-5 loader"
                 >
                   <GridLoader
                   color={'#102C58'}
                   loading={loadingFinances}
                 />
                 </div>
+                  </div>
               :
               <div>
 
@@ -100,7 +104,7 @@ export default class Finances extends Component {
                             <div className="panel-heading">
                                 Recent Purchases <i className="fa fa-user"/>
                             </div>
-                            <div className="panel-body">
+                            <div className="panel-body charge-panel-body ">
                                 {userCharges.map((charge)=>
                                         <div className="card-base">
                                             <div className="card-side">
@@ -119,8 +123,17 @@ export default class Finances extends Component {
                                             </div>
                                         </div>
                                       )}
+
                             </div>
+                              <div className="panel-footer">
+                                    <Pager>
+                                    <Pager.Item href="#">Previous</Pager.Item>
+                                    {' '}
+                                    <Pager.Item href="#">Next</Pager.Item>
+                                  </Pager>
+                              </div>
                           </div>
+
                       </div>
                       <div className="col col-sm-6">
                           <div className="panel panel-default panel-shadow charge-list">
@@ -128,7 +141,7 @@ export default class Finances extends Component {
                                 Family Purchases <i className="fa fa-users"/>
 
                             </div>
-                            <div className="panel-body">
+                            <div className="panel-body charge-panel-body">
                                  {charges.map((charge)=>
                                         <div className="card-base">
                                             <div className="card-side">
@@ -148,6 +161,13 @@ export default class Finances extends Component {
                                         </div>
                                       )}
                             </div>
+                              <div className="panel-footer">
+                                    <Pager>
+                                    <Pager.Item href="#">Previous</Pager.Item>
+                                    {' '}
+                                    <Pager.Item href="#">Next</Pager.Item>
+                                  </Pager>
+                              </div>
                           </div>
                       </div>
                   </div>
