@@ -6,16 +6,53 @@ import {
   Col,
   Navbar,
   Nav,
-  NavItem
+  NavItem,
+  Image,
 } from "react-bootstrap";
+import {GridLoader} from 'react-spinners';
 
 const Api = ApiInstance.instance;
 
 export default class Family extends Component {
+    constructor(props) {
+    super(props);
+    this.state = {
+      loading:true,
+      userProfile: {},
+      family:{},
+    };
+  }
+
+  componentDidMount() {
+        this.setState({
+            userProfile:Api.userProfile,
+            family:Api.user.family,
+            loading:false,
+        });
+  }
+
+
   render() {
+      const {loading,family} = this.state;
     return (
       <div>
-        <h1>My Family</h1>
+          {loading ?
+              <div className="col-sm-2 col-sm-offset-5 loader"
+              >
+                <GridLoader
+                    color={'#102C58'}
+                    loading={loading}
+                />
+              </div>
+              :
+              <div>
+                  {family.users.map((member) =>
+                      <div style={{width:100}}>
+                          <Image src={member.pro_pic} circle responsive/>
+                      </div>
+                  )}
+              </div>
+          }
       </div>
     );
   }

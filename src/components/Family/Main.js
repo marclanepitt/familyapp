@@ -35,6 +35,8 @@ export default class Main extends Component {
       loading: true,
         showLogoutModal:false,
         selectedMenu:0,
+        dropDown:"none",
+
     };
     this.logout = this.logout.bind(this);
     this.greeting = this.greeting.bind(this);
@@ -42,6 +44,7 @@ export default class Main extends Component {
     this.openLogoutModal=this.openLogoutModal.bind(this);
     this.openMenu = this.openMenu.bind(this);
     this.selectedMenu = this.selectedMenu.bind(this);
+    this.showDropdown = this.showDropdown.bind(this);
   }
 
   componentDidMount() {
@@ -70,7 +73,6 @@ export default class Main extends Component {
     Api.logoutUser().then(response => {
       this.props.router.push("/login");
       this.setState({ user: {} });
-
     });
   }
 
@@ -118,10 +120,22 @@ export default class Main extends Component {
    }
   }
 
+  showDropdown() {
+     if(this.state.dropDown === "none") {
+         this.setState({
+             dropDown: "block"
+         })
+     } else {
+         this.setState({
+             dropDown: "none"
+         })
+     }
+  }
+
 
 
   render() {
-    const { user,loading,family } = this.state;
+    const { user,loading,family, dropDown } = this.state;
     const greeting = this.greeting;
     return (
       <div className="app">
@@ -134,7 +148,7 @@ export default class Main extends Component {
                 </div>
               :
               <div>
-                <body id="body" className="sidebar-is-reduced">
+                <div id="body" className="sidebar-is-reduced">
                 <header className="l-header">
                   <div className="l-header__inner clearfix">
                     <div className="c-header-icon js-hamburger">
@@ -143,15 +157,21 @@ export default class Main extends Component {
                     </div>
                     <div className="c-header-icon has-dropdown"><span
                         className="c-badge c-badge--header-icon animated bounce">10</span><i className="fa fa-bell"></i>
-                      <div className="c-dropdown c-dropdown--notifications">
+                      <div className="c-dropdown">
                         <div className="c-dropdown__header"/>
                         <div className="c-dropdown__content"/>
                       </div>
                     </div>
                     <div className="family-txt">The {family.name} Family</div>
                     <div className="header-icons-group">
-                      <div className="c-header-icon logout"><i className="fa fa-power-off"/></div>
-                      <div className="c-header-icon"><Image src={user.pro_pic} circle responsive/></div>
+                      <div className="c-header-icon has-dropdown" onClick={this.showDropdown}><Image src={user.pro_pic} circle responsive/>
+                          <div className="c-dropdown c-dropdown--notifications" style={{display: dropDown}}>
+                                <div>{this.greeting()} {user.first_name}</div>
+                                <div>
+                                    <button className="btn btn-lg btn-danger" onClick={this.logout}>Logout</button>
+                                </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </header>
@@ -174,26 +194,26 @@ export default class Main extends Component {
                             className="fa fa-credit-card-alt"/>
                           <div className="c-menu-item__title"><span>Finances</span></div>
                         </li></Link>
+                        <Link to="/app/chores/"> <li className="c-menu__item" data-toggle="tooltip" title="Chores" onClick={(e) => this.selectedMenu(e)}><i className="fa fa-wrench"/>
+                          <div className="c-menu-item__title"><span>Chores</span></div>
+                       </li></Link>
                        <Link to="/app/events/"> <li className="c-menu__item" data-toggle="tooltip" title="Events" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-calendar-o"/>
                           <div className="c-menu-item__title"><span>Events</span></div>
-                       </li></Link>
-                       <Link to="/app/chores/"> <li className="c-menu__item" data-toggle="tooltip" title="Chores" onClick={(e) => this.selectedMenu(e)}><i className="fa fa-wrench"/>
-                          <div className="c-menu-item__title"><span>Chores</span></div>
                        </li></Link>
                          <Link to="/app/family/"><li className="c-menu__item" data-toggle="tooltip" title="My Family" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-pagelines"/>
                           <div className="c-menu-item__title"><span>My Family</span></div>
                          </li></Link>
-                        <li className="c-menu__item" data-toggle="tooltip" title="Settings" onClick={(e) => this.selectedMenu(e)}><i
+                        <Link to="/app/admin/"><li className="c-menu__item" data-toggle="tooltip" title="Settings" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-cogs"/>
                           <div className="c-menu-item__title"><span>Settings</span></div>
-                        </li>
+                        </li></Link>
                       </ul>
                     </nav>
                   </div>
                 </div>
-                </body>
+                </div>
                 <main className="l-main">
                   <div className="content-wrapper content-wrapper--with-bg">
                       {this.props.children}

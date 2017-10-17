@@ -22,14 +22,17 @@ export default class Chores extends Component {
       family:{},
       chores: {},
       usersChores:{},
+      availableChores:{},
       loading: true,
       history:[],
     };
 
     this.getUserChorePoints = this.getUserChorePoints.bind(this);
     this.getAvailableChoreList = this.getAvailableChoreList.bind(this);
+    this.getUsersChoreList = this.getUsersChoreList.bind(this);
     this.showHistory = this.showHistory.bind(this);
     this.buttonFormatter = this.buttonFormatter.bind(this);
+    this.setCompletedChore = this.setCompletedChore.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +52,12 @@ export default class Chores extends Component {
         });
       })
 
+      Promise.resolve(Api.getAvailableChores()).then(response=> {
+          this.setState({
+              availableChores: response,
+          });
+      })
+
     } else {
       this.props.router.push("/login");
     }
@@ -66,7 +75,23 @@ export default class Chores extends Component {
   }
 
   getAvailableChoreList() {
-    return this.state.chores;
+        let chores_list = [];
+        for(let i =0 ; i < this.state.availableChores.length; i++) {
+            if(!this.state.availableChores[i].is_completed) {
+                chores_list.push(this.state.availableChores[i]);
+            }
+        }
+        return chores_list;
+    }
+
+  getUsersChoreList() {
+        let chores_list = [];
+        for(let i =0 ; i < this.state.usersChores.length; i++) {
+            if(!this.state.usersChores[i].is_completed) {
+                chores_list.push(this.state.usersChores[i]);
+            }
+        }
+        return chores_list;
   }
 
 
@@ -92,12 +117,28 @@ export default class Chores extends Component {
 
   }
 
-  buttonFormatter() {
-      return (<button className="btn btn-success btn-sm">Done</button>)
+  setCompletedChore(chore) {
+        this.setState({
+            loading:true,
+        })
+        Promise.resolve(Api.updateChore(chore, {
+            id:chore,
+            is_completed:true
+        })).then(response=> {
+            this.componentDidMount();
+            this.setState({
+                loading:false
+            })
+        });
+  }
+
+  buttonFormatter(cell,row) {
+      return (<button className="btn btn-success btn-sm" onClick={() => {this.setCompletedChore(cell)}}>Completed?</button>)
   }
 
   render() {
-      const {loading,userProfile,family,chores,history,usersChores} = this.state;
+      const {loading,userProfile,family,chores,history, availableChores} = this.state;
+
     return (
          <div>
              {loading ?
@@ -125,8 +166,8 @@ export default class Chores extends Component {
                              <i id="caret" className="fa fa-caret-right" /> {"  "} History
                              <div>
                             {history.map((chore)=>
-                                        <div>
-                                            {chore.name} - {chore.num_points}
+                                        <div style={{color:"grey",fontSize:12,textAlign:"left"}}>
+                                            {chore.num_points} Points - {chore.name}
                                         </div>
                             )}
                             </div>
@@ -159,7 +200,7 @@ export default class Chores extends Component {
                                       <TableHeaderColumn dataField='num_points' isKey>Points</TableHeaderColumn>
                                       <TableHeaderColumn dataField='name'>Chore</TableHeaderColumn>
                                       <TableHeaderColumn dataField='time'>Time</TableHeaderColumn>
-                                      <TableHeaderColumn dataFormat={this.buttonFormatter}>Action</TableHeaderColumn>
+                                      <TableHeaderColumn dataField="id" dataFormat={this.buttonFormatter}>Action</TableHeaderColumn>
                             </BootstrapTable>
                            </div>
                          </div>
@@ -173,11 +214,14 @@ export default class Chores extends Component {
                              {userProfile.first_name}'s Chores
                          </div>
                          <div className="panel-body">
-                             {usersChores.map((chore)=>
-                                        <div>
-                                            {chore.name}
-                                        </div>
-                            )}
+                             <BootstrapTable
+                                      data={ this.getUsersChoreList() }
+                            >
+                                      <TableHeaderColumn dataField='num_points' isKey>Points</TableHeaderColumn>
+                                      <TableHeaderColumn dataField='name'>Chore</TableHeaderColumn>
+                                      <TableHeaderColumn dataField='time'>Time</TableHeaderColumn>
+                                      <TableHeaderColumn dataField="id" dataFormat={this.buttonFormatter}>Action</TableHeaderColumn>
+                            </BootstrapTable>
                          </div>
                        </div>
                      </div>

@@ -210,6 +210,32 @@ class Api {
         })
   }
 
+  getAvailableChores() {
+    return axios
+        .get(this.generateUrl("chores/chores/available/" + this.user.family.id ,"v1"), {
+          headers:this.generateTokenHeader()
+        })
+        .then(response => {
+          return response.data;
+        })
+        .catch(err=> {
+          return err;
+        })
+  }
+
+  updateChore(chore_pk,data) {
+    return axios
+        .put(this.generateUrl("chores/chores/update/" + chore_pk + "/", "v1"),data, {
+          headers:this.generateTokenHeader(),
+        })
+        .then(response => {
+          return response.data;
+        })
+        .catch(err=> {
+          return err;
+        })
+  }
+
   createPet(data, onSuccess, onError) {
     return axios
         .post(this.generateUrl("pets/create/"+this.user.family.id,"v1"),data, {
