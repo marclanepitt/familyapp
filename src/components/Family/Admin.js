@@ -10,6 +10,7 @@ import {
     Modal,
     FormGroup,
     FormControl,
+    Image,
 } from "react-bootstrap";
 import {GridLoader} from 'react-spinners';
 
@@ -21,6 +22,7 @@ export default class Admin extends Component {
         this.state = {
           userProfile: Api.userProfile,
           family:Api.user.family,
+          nonAdmins:[],
           loading: false,
           showPetModal: false,
           petName:"",
@@ -38,6 +40,15 @@ export default class Admin extends Component {
         if(this.state.userProfile.admin.indexOf("DE") !== -1) {
             this.props.router.push("/app/");
         }
+        let nonAdmins = [];
+        for(let i = 0; i < this.state.family.users.length; i++) {
+            if(this.state.family.users[i].admin.indexOf("DE") !== -1) {
+                nonAdmins.push(this.state.family.users[i])
+            }
+        }
+        this.setState({
+            nonAdmins: nonAdmins,
+        })
     }
 
     openPetModal() {
@@ -89,7 +100,7 @@ export default class Admin extends Component {
       }
 
   render() {
-      const {showPetModal, loading} = this.state;
+      const {showPetModal, loading, family, nonAdmins} = this.state;
 
     return (
 
@@ -104,8 +115,49 @@ export default class Admin extends Component {
               </div>
               :
               <div>
-                  <h1>Admin Page</h1>
-                  <button className="btn btn-lg btn-success" onClick={this.openPetModal}>Add Pet</button>
+                  <div className="row">
+                                     <div className="panel panel-default panel-shadow">
+                         <div className="panel-heading">
+                            Admin Actions
+                         </div>
+                         <div className="panel-body">
+                             <button className="btn btn-lg btn-success" onClick={this.openPetModal}>Add Pet</button>
+                             <button className="btn btn-lg btn-success" onClick={this.openPetModal}>Add Pet</button>
+                             <button className="btn btn-lg btn-success" onClick={this.openPetModal}>Add Pet</button>
+                             <button className="btn btn-lg btn-success" onClick={this.openPetModal}>Add Pet</button>
+                             <button className="btn btn-lg btn-success" onClick={this.openPetModal}>Add Pet</button>
+
+                         </div></div>
+                  </div>
+                  <div className="row">
+                      {nonAdmins.map((user)=>
+                                <div className="col col-sm-3">
+                                     <div className="panel panel-default panel-shadow">
+                         <div className="panel-heading" style={{maxHeight:60,overflowY:"hidden"}}>
+                             <div className="row">
+                                 <div className="col col-sm-3">
+                                     <Image src={user.pro_pic} circle responsive/>
+                                 </div>
+                                 <div className="col col-sm-6 text-center" style={{fontSize:26,fontWeight:800}}>
+                                 {user.first_name}
+                                 </div>
+                             </div>
+                         </div>
+                         <div className="panel-body">
+                            <div className="admin-panel-header">
+                                Finances
+                            </div>
+                             <div className="user-attribute">
+                                 Budget: {user.budget_amount}
+                             </div>
+                         </div>
+                            </div>
+                                </div>
+                      )}
+                  </div>
+
+
+
                   <Modal show={showPetModal} onHide={this.closePetModal}>
                       <form onSubmit={this.handlePetSubmit}>
                           <Modal.Header closeButton>

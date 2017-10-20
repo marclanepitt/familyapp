@@ -33,6 +33,8 @@ export default class Chores extends Component {
     this.showHistory = this.showHistory.bind(this);
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.setCompletedChore = this.setCompletedChore.bind(this);
+    this.buttonFormatterClaim = this.buttonFormatterClaim.bind(this);
+    this.setClaimedChore = this.setClaimedChore.bind(this);
   }
 
   componentDidMount() {
@@ -120,7 +122,7 @@ export default class Chores extends Component {
   setCompletedChore(chore) {
         this.setState({
             loading:true,
-        })
+        });
         Promise.resolve(Api.updateChore(chore, {
             id:chore,
             is_completed:true
@@ -132,8 +134,26 @@ export default class Chores extends Component {
         });
   }
 
+  setClaimedChore(chore) {
+      this.setState({
+            loading:true,
+        });
+        Promise.resolve(Api.updateChore(chore, {
+            id:chore,
+            participants : [this.state.userProfile.id],
+        })).then(response=> {
+            this.componentDidMount();
+            this.setState({
+                loading:false
+            })
+        });
+  }
+
   buttonFormatter(cell,row) {
       return (<button className="btn btn-success btn-sm" onClick={() => {this.setCompletedChore(cell)}}>Completed?</button>)
+  }
+  buttonFormatterClaim(cell,row) {
+      return (<button className="btn btn-warning btn-sm" onClick={() => {this.setClaimedChore(cell)}}>Claim</button>)
   }
 
   render() {
@@ -200,7 +220,7 @@ export default class Chores extends Component {
                                       <TableHeaderColumn dataField='num_points' isKey>Points</TableHeaderColumn>
                                       <TableHeaderColumn dataField='name'>Chore</TableHeaderColumn>
                                       <TableHeaderColumn dataField='time'>Time</TableHeaderColumn>
-                                      <TableHeaderColumn dataField="id" dataFormat={this.buttonFormatter}>Action</TableHeaderColumn>
+                                      <TableHeaderColumn dataField="id" dataFormat={this.buttonFormatterClaim}>Action</TableHeaderColumn>
                             </BootstrapTable>
                            </div>
                          </div>

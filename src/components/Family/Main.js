@@ -4,22 +4,11 @@ import ApiInstance from "../../js/utils/Api";
 import Cookies from "js-cookie";
 import "./css/main.css";
 import {
-  Modal,
-  Button,
-  Col,
-  Row,
-  Navbar,
-  Nav,
-  NavItem,
-  NavDropdown,
-  MenuItem,
-  Image
+  Image,
+  Alert
 } from "react-bootstrap";
-import {Icon} from "react-fa";
-import dashPic from "./img/home.png";
-import choresPic from "./img/chores.png";
-import calPic from "./img/cal.png";
-import financePic from "./img/finance.png";
+
+import logo from "../../img/kinly_logo.png";
 import { GridLoader } from 'react-spinners';
 
 const Api = ApiInstance.instance;
@@ -36,7 +25,9 @@ export default class Main extends Component {
         showLogoutModal:false,
         selectedMenu:0,
         dropDown:"none",
-
+    alertStyle:"",
+    alertMessage:"",
+    alertVsiible:false,
     };
     this.logout = this.logout.bind(this);
     this.greeting = this.greeting.bind(this);
@@ -45,6 +36,7 @@ export default class Main extends Component {
     this.openMenu = this.openMenu.bind(this);
     this.selectedMenu = this.selectedMenu.bind(this);
     this.showDropdown = this.showDropdown.bind(this);
+    this.handleAlertDismiss = this.handleAlertDismiss.bind(this);
   }
 
   componentDidMount() {
@@ -102,12 +94,23 @@ export default class Main extends Component {
   }
 
  selectedMenu(e){
+        if(e.target.parentElement.id === "admin" && this.state.user.admin.indexOf("DE") !== -1) {
+            this.setState({
+                alertVisible:true,
+                alertMessage:"You are not permitted to access this feature.",
+                alertStyle: "warning",
+            })
+        }
+        if(e.target.parentElement.id !== "dashboard") {
+            this.props.router.push("/app/" + e.target.parentElement.id + "/");
+        } else {
+             this.props.router.push("/app/");
+        }
         var els = document.getElementsByClassName("is-active");
         while(els.length > 0) {
            els[0].className = 'c-menu__item';
         }
-        e.target.parentElement.className = "c-menu__item is-active";
-        console.log(e)
+        document.getElementById(e.target.parentElement.id).className = "c-menu__item is-active";
   }
 
   openMenu() {
@@ -118,6 +121,14 @@ export default class Main extends Component {
        document.getElementById("body").className = "sidebar-is-reduced sidebar-is-expanded";
        document.getElementById("hamburger").className = "hamburger-toggle is-opened";
    }
+  }
+
+  handleAlertDismiss() {
+     this.setState({
+         alertVisible:false,
+         alertMessage:"",
+         alertStyle:"",
+     })
   }
 
   showDropdown() {
@@ -135,7 +146,7 @@ export default class Main extends Component {
 
 
   render() {
-    const { user,loading,family, dropDown } = this.state;
+    const { user,loading,family, dropDown, alertMessage,alertStyle, alertVisible } = this.state;
     const greeting = this.greeting;
     return (
       <div className="app">
@@ -177,38 +188,38 @@ export default class Main extends Component {
                 </header>
                 <div className="l-sidebar">
                   <div className="logo">
-                    <div className="logo__txt">F</div>
+                    <div className="logo__txt"><Image src={logo} responsive style={{maxWidth:130,marginLeft:6,marginBottom:8}}/></div>
                   </div>
                   <div className="l-sidebar__content">
                     <nav className="c-menu js-menu">
                       <ul className="u-list">
-                        <Link to="/app/"><li className="c-menu__item is-active" data-toggle="tooltip" title="Living Room" onClick={(e) => this.selectedMenu(e)}><i
+                        <li className="c-menu__item" data-toggle="tooltip" title="Living Room" id="dashboard" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-home"/>
                           <div className="c-menu-item__title"><span>Living Room</span></div>
-                        </li></Link>
-                          <li className="c-menu__item" data-toggle="tooltip" title="Groups" onClick={(e) => this.selectedMenu(e)}><i
+                        </li>
+                          <li className="c-menu__item" data-toggle="tooltip" title="Groups" id="groups" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-users"/>
                           <div className="c-menu-item__title"><span>Groups</span></div>
                         </li>
-                        <Link to="/app/finances/"><li className="c-menu__item" data-toggle="tooltip" title="Finances" onClick={(e) => this.selectedMenu(e)}><i
+                       <li className="c-menu__item" data-toggle="tooltip" title="Finances" id="finances" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-credit-card-alt"/>
                           <div className="c-menu-item__title"><span>Finances</span></div>
-                        </li></Link>
-                        <Link to="/app/chores/"> <li className="c-menu__item" data-toggle="tooltip" title="Chores" onClick={(e) => this.selectedMenu(e)}><i className="fa fa-wrench"/>
+                        </li>
+                      <li className="c-menu__item" data-toggle="tooltip" title="Chores" id="chores" onClick={(e) => this.selectedMenu(e)}><i className="fa fa-wrench"/>
                           <div className="c-menu-item__title"><span>Chores</span></div>
-                       </li></Link>
-                       <Link to="/app/events/"> <li className="c-menu__item" data-toggle="tooltip" title="Events" onClick={(e) => this.selectedMenu(e)}><i
+                       </li>
+                       <li className="c-menu__item" data-toggle="tooltip" title="Events" id="events" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-calendar-o"/>
                           <div className="c-menu-item__title"><span>Events</span></div>
-                       </li></Link>
-                         <Link to="/app/family/"><li className="c-menu__item" data-toggle="tooltip" title="My Family" onClick={(e) => this.selectedMenu(e)}><i
+                       </li>
+                         <li className="c-menu__item" data-toggle="tooltip" title="My Family" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-pagelines"/>
                           <div className="c-menu-item__title"><span>My Family</span></div>
-                         </li></Link>
-                        <Link to="/app/admin/"><li className="c-menu__item" data-toggle="tooltip" title="Settings" onClick={(e) => this.selectedMenu(e)}><i
-                            className="fa fa-cogs"/>
+                         </li>
+                        <li className="c-menu__item" data-toggle="tooltip" title="Settings" id="admin" onClick={(e) => this.selectedMenu(e)}><i
+                            className="fa fa-tasks"/>
                           <div className="c-menu-item__title"><span>Settings</span></div>
-                        </li></Link>
+                        </li>
                       </ul>
                     </nav>
                   </div>
@@ -216,6 +227,12 @@ export default class Main extends Component {
                 </div>
                 <main className="l-main">
                   <div className="content-wrapper content-wrapper--with-bg">
+                      {alertVisible ?
+                        <Alert bsStyle={alertStyle} onDismiss={this.handleAlertDismiss}>
+                            {alertMessage}
+                        </Alert> :
+                        <div></div>
+                    }
                       {this.props.children}
                   </div>
                 </main>

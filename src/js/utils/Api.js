@@ -199,7 +199,7 @@ class Api {
 
   getUsersChores() {
         return axios
-        .get(this.generateUrl("chores/chores/" + this.user.family.id + "/" + this.userProfile.id, "v1"), {
+        .get(this.generateUrl("chores/chores/user/" + this.userProfile.id, "v1"), {
           headers:this.generateTokenHeader()
         })
         .then(response=> {
