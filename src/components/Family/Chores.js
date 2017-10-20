@@ -2,11 +2,10 @@ import React, { Component } from "react";
 import ApiInstance from "../../js/utils/Api";
 import "./css/main.css";
 import {
-  Button,
-  Col,
-  Navbar,
-  Nav,
-  NavItem
+    Modal,
+    DropdownButton,
+    MenuItem
+
 } from "react-bootstrap";
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import {GridLoader} from "react-spinners";
@@ -25,6 +24,10 @@ export default class Chores extends Component {
       availableChores:{},
       loading: true,
       history:[],
+      historyData:{},
+      historyDate:"",
+      showHistoryModal:false,
+      historySelect:"Date Completed",
     };
 
     this.getUserChorePoints = this.getUserChorePoints.bind(this);
@@ -35,6 +38,11 @@ export default class Chores extends Component {
     this.setCompletedChore = this.setCompletedChore.bind(this);
     this.buttonFormatterClaim = this.buttonFormatterClaim.bind(this);
     this.setClaimedChore = this.setClaimedChore.bind(this);
+    this.showHistoryModal = this.showHistoryModal.bind(this);
+    this.closeHistoryModal = this.closeHistoryModal.bind(this);
+    this.convertToDateReadable = this.convertToDateReadable.bind(this);
+    this.handleMenuChange = this.handleMenuChange.bind(this);
+    this.convertTimeToClockDisplay = this.convertTimeToClockDisplay.bind(this);
   }
 
   componentDidMount() {
@@ -119,13 +127,30 @@ export default class Chores extends Component {
 
   }
 
+  showHistoryModal(data) {
+      let date = this.convertToDateReadable(data['date_start']);
+      this.setState({
+            historyData: data,
+            historyDate: date,
+            showHistoryModal:true,
+        })
+  }
+
+  closeHistoryModal() {
+        this.setState({
+            historyData:{},
+            showHistoryModal:false,
+        })
+  }
+
   setCompletedChore(chore) {
         this.setState({
             loading:true,
         });
         Promise.resolve(Api.updateChore(chore, {
             id:chore,
-            is_completed:true
+            is_completed:true,
+            completed_date: new Date(),
         })).then(response=> {
             this.componentDidMount();
             this.setState({
@@ -149,6 +174,49 @@ export default class Chores extends Component {
         });
   }
 
+  convertToDateReadable(date) {
+        //date is in YYYY-MM-DD format
+      let monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      let d = date.split("-");
+      let month = monthNames[d[1]];
+      return month+" " + d[2] + ", " +d[0];
+
+  }
+
+  convertTimeToClockDisplay() {
+      let t = this.state.historyData.completed_date;
+      let dt = t.split("T");
+      var time_array = dt[1].split("-");
+      var ampm = "";
+      if(parseInt(time_array[0]) > 12) {
+          ampm = "PM"
+      } else {
+          ampm = "AM"
+      }
+      return  (
+      <div>
+          <div className="clock-num col col-sm-2">
+              {time_array[0]}
+          </div>
+          <div className="clock-num col-col-sm-2">
+              {time_array[1]}
+          </div>
+          <div className="ampm">
+              {ampm}
+          </div>
+      </div>
+      )
+  }
+  
+  handleMenuChange(type) {
+        this.setState({
+            historySelect:type,
+        })
+  }
+
   buttonFormatter(cell,row) {
       return (<button className="btn btn-success btn-sm" onClick={() => {this.setCompletedChore(cell)}}>Completed?</button>)
   }
@@ -157,8 +225,7 @@ export default class Chores extends Component {
   }
 
   render() {
-      const {loading,userProfile,family,chores,history, availableChores} = this.state;
-
+      const {loading,userProfile,family,chores,history, availableChores, showHistoryModal,historyData,historyDate,historySelect} = this.state;
     return (
          <div>
              {loading ?
@@ -186,7 +253,7 @@ export default class Chores extends Component {
                              <i id="caret" className="fa fa-caret-right" /> {"  "} History
                              <div>
                             {history.map((chore)=>
-                                        <div style={{color:"grey",fontSize:12,textAlign:"left"}}>
+                                        <div className="history-chore" onClick={() => this.showHistoryModal(chore)}>
                                             {chore.num_points} Points - {chore.name}
                                         </div>
                             )}
@@ -247,7 +314,71 @@ export default class Chores extends Component {
                      </div>
                    </div>
                  </div>
+
              }
+              <Modal show={showHistoryModal} onHide={this.closeHistoryModal}>
+                          <Modal.Header closeButton>
+                              <div className="text-center">
+                                  <Modal.Title><span style={{fontWeight:900}}> {historyData.name} on {historyDate}</span></Modal.Title>
+                              </div>
+                          </Modal.Header>
+                          <Modal.Body>
+                              <div className="row">
+                                  <div className="col col-sm-4">
+                                    <div className="panel panel-default panel-shadow">
+                                     <div className="panel-heading text-center">
+                                    <DropdownButton title={historySelect} id="bg-nested-dropdown">
+                                          <MenuItem eventKey="1" onClick={() => this.handleMenuChange("Date Completed")}>Date Completed</MenuItem>
+                                          <MenuItem eventKey="2" onClick={() => this.handleMenuChange("Date Redeemed")}>Date Redeemed</MenuItem>
+                                    </DropdownButton>
+                                     </div>
+                                     <div className="panel-body">
+                                         {historySelect === "Date Completed" ?
+                                             <div>
+                                                 {historyData.completed_date === null ?
+                                                     <div className="text-center" style={{fontWeight:800}}>
+                                                         <p>Not Completed</p>
+                                                     </div>
+                                                     :
+                                                     <div>
+                                                         {historyData.completed_date}
+                                                     </div>
+                                                 }
+                                             </div>
+                                             :
+                                             <div>
+                                              {historyData.redeemed_date === null ?
+                                                     <div className="text-center" style={{fontWeight:800}}>
+                                                         <p>Not Redeemed</p>
+                                                     </div>
+                                                     :
+                                                     <div>
+                                                      {historyData.redeemed_date}
+                                                     </div>
+                                                 }
+                                             </div>
+                                         }
+                                     </div>
+                                   </div>
+                                  </div>
+                              </div>
+                              <div className="row">
+                                  <div className="col col-sm-4">
+                                    <div className="panel panel-default panel-shadow">
+                                     <div className="panel-heading text-center">
+                                        Points
+                                     </div>
+                                     <div className="panel-body text-center">
+                                        <div className="point-display">
+                                            {historyData.num_points}
+                                        </div>
+                                     </div>
+                                   </div>
+                                  </div>
+                              </div>
+                          </Modal.Body>
+
+                  </Modal>
          </div>
     );
   }
