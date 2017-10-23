@@ -33,7 +33,6 @@ ReactDOM.render(
                 <Route path = "finances" component={Finances}/>
                 <Route path = "admin" component={Admin}/>
                 <Route path = "events" component={Events}/>
-                <Route path = "family" component={Family}/>
                 <Route path = "chores" component={Chores}/>
             </Route>
         </Route>

@@ -5,11 +5,38 @@ import Cookies from "js-cookie";
 import "./css/main.css";
 import {
   Image,
-  Alert
+  Alert,
+  Modal,
+  Button,
+  FormGroup,
+  FormControl,
 } from "react-bootstrap";
+import Dropzone from 'react-dropzone';
 
 import logo from "../../img/kinly_logo.png";
 import { GridLoader } from 'react-spinners';
+import Icon from "../../../node_modules/react-fa/lib/Icon";
+import { bounce, slideInDown,swing,slideOutLeft,fadeIn } from 'react-animations';
+import Radium, {StyleRoot} from 'radium';
+
+const styles = {
+  bounce: {
+    animation: 'x 1s',
+    animationName: Radium.keyframes(bounce, 'bounce')
+  },
+  slideIn: {
+    animation: 'x 1s',
+    animationName: Radium.keyframes(slideInDown,'slideInDown')
+  },
+  swing: {
+    animation: '5 1s',
+    animationName:Radium.keyframes(swing,'swing')
+  },
+  fadeIn: {
+    animation: 'x 1s',
+    animationName: Radium.keyframes(fadeIn,'fadeIn')
+  }
+}
 
 const Api = ApiInstance.instance;
 
@@ -27,7 +54,20 @@ export default class Main extends Component {
         dropDown:"none",
     alertStyle:"",
     alertMessage:"",
-    alertVsiible:false,
+    alertVisible:false,
+    picAlertMessage:"",
+    picAlertVisible:false,
+    showChangeUserProPic:false,
+    showProPicModal:false,
+    uploadedFile:"",
+    imagePreviewUrl:"",
+    showPreview:false,
+    showProfileModal:false,
+    showPasswordInput:false,
+    selectedSwitchPic:"",
+    selectedUser:{},
+    showEditProfileModal:false,
+
     };
     this.logout = this.logout.bind(this);
     this.greeting = this.greeting.bind(this);
@@ -37,7 +77,21 @@ export default class Main extends Component {
     this.selectedMenu = this.selectedMenu.bind(this);
     this.showDropdown = this.showDropdown.bind(this);
     this.handleAlertDismiss = this.handleAlertDismiss.bind(this);
-  }
+    this.showChangeUserProPic = this.showChangeUserProPic.bind(this);
+    this.hideChangeUserProPic = this.hideChangeUserProPic.bind(this);
+    this.showProPicModal = this.showProPicModal.bind(this);
+    this.hideProPicModal = this.hideProPicModal.bind(this);
+    this.onImageDrop = this.onImageDrop.bind(this);
+    this.handleProPicSubmit = this.handleProPicSubmit.bind(this);
+    this.handlePicAlertDismiss = this.handlePicAlertDismiss.bind(this);
+    this.hideProfileModal =this.hideProfileModal.bind(this);
+    this.showProfileModal = this.showProfileModal.bind(this);
+    this.handleProfileSwitchSubmit = this.handleProfileSwitchSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.selectedUser = this.selectedUser.bind(this);
+    this.showEditProfileModal = this.showEditProfileModal.bind(this);
+    this.hideEditProfileModal = this.hideEditProfileModal.bind(this);
+  } 
 
   componentDidMount() {
     var upid =  Cookies.get("upid");
@@ -123,6 +177,18 @@ export default class Main extends Component {
    }
   }
 
+  showEditProfileModal() {
+    this.setState({
+      showEditProfileModal:true,
+    })
+  }
+
+  hideEditProfileModal() {
+    this.setState({
+      showEditProfileModal:false,
+    })
+  }
+
   handleAlertDismiss() {
      this.setState({
          alertVisible:false,
@@ -130,6 +196,57 @@ export default class Main extends Component {
          alertStyle:"",
      })
   }
+
+  handlePicAlertDismiss() {
+      this.setState({
+         picAlertVisible:false,
+         picAlertMessage:"",
+     })
+  }
+
+  handleProfileSwitchSubmit(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setState({ loading: true });
+        const { selectedUser, password } = this.state;
+        const data = {
+            "id":selectedUser,
+            password
+        };
+        const onSuccess = response => {
+            Api.store("upid",selectedUser);
+            this.setState({
+              loading:false,
+              showProfileModal:false,
+            })
+            this.componentDidMount();
+        }
+
+        const onError = err => {
+            this.setState({ loading: "" });
+            this.setState({ errors: err.response.data.detail });
+            this.setState({ error_display:""});
+        };
+        const response = Api.loginUserProfile(data,onSuccess, onError,selectedUser);
+
+        this.setState({ errors: response.data });
+        return false;
+  }
+
+  selectedUser(user) {
+      this.setState({
+        selectedUser:user.id,
+        selectedSwitchPic:user.pro_pic,
+        showPasswordInput:true,
+      });
+  }
+
+   handleInputChange(e, field) {
+        const { state } = this;
+        state[field] = e.target.value;
+        this.setState(state);
+  }
+
 
   showDropdown() {
      if(this.state.dropDown === "none") {
@@ -143,15 +260,114 @@ export default class Main extends Component {
      }
   }
 
+  showChangeUserProPic() {
+     this.setState({
+         showChangeUserProPic:true,
+     })
+  }
+
+  hideChangeUserProPic() {
+     this.setState({
+        showChangeUserProPic:false,
+     })
+  }
+
+  showProPicModal() {
+    this.setState({
+      showProPicModal:true
+    })
+  }
+
+  hideProPicModal() {
+    this.setState({
+      showProPicModal:false,
+      uploadedFile:"",
+      imagePreviewUrl:"",
+      showPreview:false,
+    })  
+  }
+
+  hideProfileModal() {
+    this.setState({
+      showProfileModal:false
+    })
+  }
+
+  showProfileModal() {
+    this.setState({
+      showProfileModal:true
+    })
+  }
+
+ onImageDrop(files) {
+    let reader = new FileReader();
+    let file = files[0];
+
+    reader.onloadend = () => {
+      this.setState({
+        uploadedFile: file,
+        imagePreviewUrl: reader.result,
+        showPreview:true,
+      });
+    }
+    try {
+     reader.readAsDataURL(file)
+    } catch(err) {
+      this.setState({
+        picAlertVisible:true,
+        picAlertMessage:"Oops.  That is not a supported file type."
+      })
+    }
+}
+
+handleProPicSubmit() {
+  this.setState({
+      loading:true,
+  })
+  const {user, uploadedFile} = this.state;
+  console.log(user.id)
+  var formData = new FormData();
+  formData.append("pro_pic",uploadedFile);
+  formData.append("id",user.id);
+  const onSuccess = response => {
+    this.setState({
+      loading:false,
+      alertVisible:true,
+      alertStyle:"success",
+      alertMessage:"You have successfully updated your profile picture.",
+      showProPicModal:false,
+      user:response,
+      uploadedFile:"",
+      imagePreviewUrl:"",
+      showPreview:false,
+    })
+  }
+  const onError = err=> {
+    this.setState({
+      loading:false,
+      alertVisible:true,
+      alertStyle:"danger",
+      alertMessage:"Oops. Something went wrong when trying to change your picture.  Please try again later.",
+      showProPicModal:false,
+      uploadedFile:"",
+      imagePreviewUrl:"",
+      showPreview:false,
+    })
+  }
+  Api.updateUserProfile(formData,onSuccess,onError);
+}
 
 
   render() {
-    const { user,loading,family, dropDown, alertMessage,alertStyle, alertVisible } = this.state;
+    const { user,loading,family, dropDown, alertMessage,alertStyle, alertVisible, showChangeUserProPic, showProPicModal,uploadedFile,imagePreviewUrl,showPreview, picAlertMessage, picAlertVisible,
+      showProfileModal ,showPasswordInput, selectedSwitchPic,showEditProfileModal} = this.state;
     const greeting = this.greeting;
+    var alertClass = "main-alert alert alert-" + alertStyle;
     return (
+      <StyleRoot>
       <div className="app">
           {loading ?
-                <div className="col-sm-2 col-sm-offset-5 loader"
+                <div className="loader" style={{marginLeft:610}}
                 >
                   <GridLoader
                   color={'#102C58'}
@@ -167,7 +383,7 @@ export default class Main extends Component {
                           className="bar-mid"/><span className="bar-bot"/></button>
                     </div>
                     <div className="c-header-icon has-dropdown"><span
-                        className="c-badge c-badge--header-icon animated bounce">10</span><i className="fa fa-bell"></i>
+                        className="c-badge c-badge--header-icon" >10</span><i style={styles.swing} className="fa fa-bell"></i>
                       <div className="c-dropdown">
                         <div className="c-dropdown__header"/>
                         <div className="c-dropdown__content"/>
@@ -177,9 +393,31 @@ export default class Main extends Component {
                     <div className="header-icons-group">
                       <div className="c-header-icon has-dropdown" onClick={this.showDropdown}><Image src={user.pro_pic} circle responsive/>
                           <div className="c-dropdown c-dropdown--notifications" style={{display: dropDown}}>
-                                <div>{this.greeting()} {user.first_name}</div>
-                                <div>
-                                    <button className="btn btn-lg btn-danger" onClick={this.logout}>Logout</button>
+                                <div className="row">
+                                    <div className="col col-sm-6 col-md-offset-3 dropdown-img">
+                                        {showChangeUserProPic ?
+                                            <div onClick={this.showProPicModal} onMouseEnter={this.showChangeUserProPic}  onMouseLeave={this.hideChangeUserProPic} className="image-overlay">
+                                                <button className="btn btn-default overlay-btn">Edit</button>
+                                            </div>
+                                            :
+                                            <div/>
+                                        }
+                                        <Image onMouseEnter={this.showChangeUserProPic} onMouseLeave={this.hideChangeUserProPic} src={user.pro_pic} circle responsive/>
+                                    </div>
+                                </div>
+                                        <div style={{fontWeight:800,marginLeft:77}}>{greeting()} {user.first_name}</div>
+                                    <div className="row dropdown-actions">
+                                        <div className="col col-sm-4 col-md-offset-2">
+                                            <button className="btn btn-danger" onClick={this.logout}>Logout</button>
+                                        </div>
+                                        <div className="col col-sm-4">
+                                            <button className="btn btn-primary" onClick={this.showEditProfileModal}>My Account</button>
+                                        </div>
+                                    </div>
+                                <div className="row">
+                                    <div >
+                                        <button className="btn btn-warning dropdown-profile-btn" onClick={this.showProfileModal}> Switch Profile</button>
+                                    </div>
                                 </div>
                         </div>
                       </div>
@@ -212,13 +450,9 @@ export default class Main extends Component {
                             className="fa fa-calendar-o"/>
                           <div className="c-menu-item__title"><span>Events</span></div>
                        </li>
-                         <li className="c-menu__item" data-toggle="tooltip" title="My Family" onClick={(e) => this.selectedMenu(e)}><i
-                            className="fa fa-pagelines"/>
-                          <div className="c-menu-item__title"><span>My Family</span></div>
-                         </li>
-                        <li className="c-menu__item" data-toggle="tooltip" title="Settings" id="admin" onClick={(e) => this.selectedMenu(e)}><i
+                        <li className="c-menu__item" data-toggle="tooltip" title="Admin" id="admin" onClick={(e) => this.selectedMenu(e)}><i
                             className="fa fa-tasks"/>
-                          <div className="c-menu-item__title"><span>Settings</span></div>
+                          <div className="c-menu-item__title"><span>Admin</span></div>
                         </li>
                       </ul>
                     </nav>
@@ -228,17 +462,131 @@ export default class Main extends Component {
                 <main className="l-main">
                   <div className="content-wrapper content-wrapper--with-bg">
                       {alertVisible ?
-                        <Alert bsStyle={alertStyle} onDismiss={this.handleAlertDismiss}>
+                        <div className={alertClass} style={styles.bounce}>
                             {alertMessage}
-                        </Alert> :
+                            <button type="button" className="close" onClick={this.handleAlertDismiss}>
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div> :
                         <div></div>
                     }
                       {this.props.children}
                   </div>
                 </main>
+                <Modal show={showProPicModal} onHide={this.hideProPicModal}>
+                        <Modal.Body> 
+                        {picAlertVisible ?
+                            <div className="alert alert-danger">
+                                {picAlertMessage}
+                                <button type="button" className="close" onClick={this.handlePicAlertDismiss}>
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div> :
+                            <div></div>
+                          }
+                            <Dropzone className="picture-drag"
+                            multiple={false}
+                            accept="image/*"
+                            onDrop={this.onImageDrop}>
+                            <div className="picture-drag-text">
+                            <b>Choose</b> or <b>Drag</b> an image
+                            <div style={{marginTop:18}}>
+                             <i style={{fontSize:35,marginLeft:59}}className="fa fa-picture-o"/>
+                             {showPreview ?
+                             <div className="image-preview">
+                               <Image className="previewed-image" src={imagePreviewUrl} responsive circle/>
+                               <Button onClick={this.handleProPicSubmit} className = "preview-btn" bsStyle={"success"}><i className="fa fa-upload"/></Button>
+                             </div>
+                             :
+                             <div/>
+                           }
+                            </div>
+                          </div>
+                          </Dropzone>
+                              </Modal.Body>
+                  </Modal>
+                  <Modal show={showProfileModal} onHide={this.hideProfileModal}>
+                        <Modal.Body> 
+                        <div> Please Select A Profile </div>
+                          <div className="row">
+                          {family.users.map((user)=>
+                              <div className="col-md-2">
+                                 <div onClick={() => this.selectedUser(user)} className="ratio img-responsive img-circle" style={{backgroundImage : "url("+user.pro_pic+")"}}/>
+                                  <h4>{user.first_name}</h4>
+                              </div>
+                          )}
+                          </div>
+                          </Modal.Body>
+                          <Modal.Footer>
+                                  {showPasswordInput ?
+                              <div className="col col-sm-2 col-md-offset-5" style={styles.fadeIn}>
+                                  <div className="ratio img-responsive img-circle" style={{backgroundImage : "url("+selectedSwitchPic+")"}}/>
+                                  <br/>
+                                <form onSubmit={this.handleProfileSwitchSubmit}>
+                                     <FormGroup
+                                            controlId="password"
+                                        >
+                                            <FormControl
+                                                type="password"
+                                                placeholder="Passcode"
+                                                onChange={e =>
+                                                    this.handleInputChange(e, "password")}
+                                            />
+                                            <FormControl.Feedback />
+                                        </FormGroup>
+                                    <div className="text-center">
+                                            <Button bsStyle={"primary"} type="submit">
+                                                Login
+                                            </Button>
+                                        </div>
+                                </form>
+                              </div>
+                              :
+                              <div></div>
+                          }
+                          </Modal.Footer>
+                  </Modal>
+                  <Modal show={showEditProfileModal} onHide={this.hideEditProfileModal}>
+                          <Modal.Header style={{fontWeight:800}} className="text-center">
+                          {user.first_name}'s Profile
+                          </Modal.Header>
+                          <form>
+                          <Modal.Body>
+                          <div className="row" style={{borderBottom:'1px dashed #dddddd'}}>
+                          <div className="col col-sm-3 col-md-offset-3">
+                            <div style={{marginTop:12,fontWeight:600}}>
+                              First Name:
+                            </div>
+                          </div>
+                          <div className="col col-sm-3">
+                                <FormGroup style={{marginTop:5}}
+                                          controlId="first_name"
+                                      >
+                                          <FormControl
+                                              type="text"
+                                              placeholder={user.first_name}
+                                              onChange={e =>
+                                                  this.handleInputChange(e, "userFirstName")}
+                                          />
+                                          <FormControl.Feedback/>
+                                </FormGroup>
+                              </div>
+                            </div>
+                            
+
+                          </Modal.Body>
+                          <Modal.Footer>
+                          <div>
+                            <button className="btn btn-danger">Cancel</button>
+                            <button className="btn btn-primary">Save Changes</button>
+                          </div>
+                          </Modal.Footer>
+                          </form>
+                  </Modal>
               </div>
           }
       </div>
+          </StyleRoot>
     );
   }
 }

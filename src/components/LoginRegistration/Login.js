@@ -96,7 +96,7 @@ export default class Login extends Component {
                                     className="loader"
                                 >
                                     <GridLoader
-                                        color={'#36d7b7'}
+                                       color={'#102C58'}
                                         loading={loading}
                                     />
                                 </div> :

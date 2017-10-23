@@ -137,6 +137,19 @@ class Api {
       });
   }
 
+  updateUserProfile(data, onSuccess,onError) {
+    return axios
+        .put(this.generateUrl("users/update/"+this.upid+"/", "v1"),data, {
+          headers:this.generateTokenHeader(),
+        })
+        .then(response => {
+          return onSuccess(response.data);
+        })
+        .catch(err=> {
+          return onError(err);
+        })
+  }
+
   isAuthenticated() {
     return this.uuid !== "";
   }
@@ -186,7 +199,7 @@ class Api {
 
   getChores() {
     return axios
-        .get(this.generateUrl("chores/chores/" + this.user.family.id, "v1"), {
+        .get(this.generateUrl("chores/" + this.user.family.id, "v1"), {
           headers:this.generateTokenHeader()
         })
         .then(response=> {
@@ -199,7 +212,7 @@ class Api {
 
   getUsersChores() {
         return axios
-        .get(this.generateUrl("chores/chores/user/" + this.userProfile.id, "v1"), {
+        .get(this.generateUrl("chores/user/" + this.userProfile.id, "v1"), {
           headers:this.generateTokenHeader()
         })
         .then(response=> {
@@ -212,7 +225,7 @@ class Api {
 
   getAvailableChores() {
     return axios
-        .get(this.generateUrl("chores/chores/available/" + this.user.family.id ,"v1"), {
+        .get(this.generateUrl("chores/available/" + this.user.family.id ,"v1"), {
           headers:this.generateTokenHeader()
         })
         .then(response => {
@@ -225,7 +238,81 @@ class Api {
 
   updateChore(chore_pk,data) {
     return axios
-        .put(this.generateUrl("chores/chores/update/" + chore_pk + "/", "v1"),data, {
+        .put(this.generateUrl("chores/update/" + chore_pk + "/", "v1"),data, {
+          headers:this.generateTokenHeader(),
+        })
+        .then(response => {
+          return response.data;
+        })
+        .catch(err=> {
+          return err;
+        })
+  }
+
+  completeChore(chore_pk) {
+      return axios.get(this.generateUrl("chores/complete/" + chore_pk +"/" + this.upid +"/","v1"), {
+          headers: this.generateTokenHeader(),
+      })
+      .then(response => {
+          return response.data;
+      })
+      .catch(err => {
+          return err;
+      })
+  }
+
+  getChoreLeaderBoard() {
+      return axios.get(this.generateUrl("chores/leaderboard/" + this.user.family.id +"/","v1"), {
+          headers: this.generateTokenHeader(),
+      })
+      .then(response => {
+          return response.data;
+      })
+      .catch(err => {
+          return err;
+      })
+  }
+
+  getLeaderBoardPaginate(url) {
+      return axios.get(url, {
+          headers: this.generateTokenHeader(),
+      })
+      .then(response => {
+          return response.data;
+      })
+      .catch(err => {
+          return err;
+      })
+  }
+
+  getChoreRewards() {
+    return axios.get(this.generateUrl("chores/rewards/" + this.userProfile.id + "/", "v1"), {
+      headers: this.generateTokenHeader(),
+    })
+    .then(response => {
+      return response.data;
+    })
+    .catch(err=> {
+      return err;
+    })
+  }
+
+  updateChoreReward(reward_pk,data) {
+    return axios
+        .put(this.generateUrl("chores/rewards/update/" + reward_pk + "/", "v1"),data, {
+          headers:this.generateTokenHeader(),
+        })
+        .then(response => {
+          return response.data;
+        })
+        .catch(err=> {
+          return err;
+        })
+  }
+
+    redeemChoreReward(reward_pk,data) {
+    return axios
+        .put(this.generateUrl("chores/rewards/redeem/" + reward_pk + "/", "v1"),data, {
           headers:this.generateTokenHeader(),
         })
         .then(response => {
