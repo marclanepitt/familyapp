@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import ApiInstance from "../../js/utils/Api";
 import "./css/main.css";
-import { Button, Col, Navbar, Nav, NavItem, Row, Modal, FormGroup, FormControl, Image } from "react-bootstrap";
+import { Button, Col, Row, Modal, FormGroup, FormControl, Image } from "react-bootstrap";
 import financePic from "./img/finance.png";
-import { GridLoader } from 'react-spinners';
-
+import { GridLoader, ClipLoader } from 'react-spinners';
+import Scroll from 'react-scroll';
+import {scroller} from 'react-scroll';
 
 const Api = ApiInstance.instance;
 
@@ -21,15 +22,19 @@ export default class Dashboard extends Component {
       chargeAmount:"",
       chargeLocation:"",
       posts:{},
+      postSubmitText:"",
+      postsLoading:false,
     };
     this.openChargeModal = this.openChargeModal.bind(this);
     this.closeChargeModal = this.closeChargeModal.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChargeSubmit = this.handleChargeSubmit.bind(this);
+    this.handlePostSubmit = this.handlePostSubmit.bind(this);
   }
 
   componentDidMount() {
     Promise.resolve(Api.getPosts()).then(response => {
+
         this.setState({
             userProfile:Api.userProfile,
             family:Api.user.family,
@@ -77,6 +82,35 @@ export default class Dashboard extends Component {
         const response = Api.createCharge(data, onSuccess, onError);
   }
 
+  handlePostSubmit(e) {
+    this.setState({
+      postsLoading:true,
+    });
+    e.preventDefault();
+    e.stopPropagation();
+    const { postSubmitText, userProfile, family } = this.state;
+    const data = {
+      message : postSubmitText,
+      family : [family.id,],
+      posted_by : userProfile.id,
+    }
+
+    const onSuccess = response => {
+      this.componentDidMount();
+      this.setState({
+        postsLoading: false,
+      });
+    }
+
+    const onError = err => {
+      this.setState({
+        postsLoading:false,
+      })
+    }
+
+    Api.createPost(data,onSuccess,onError);
+  }
+
   closeChargeModal() {
       this.setState({
           showChargeModal:false
@@ -92,7 +126,7 @@ export default class Dashboard extends Component {
 
 
   render() {
-    const {family,userProfile,showChargeModal,posts,loading} = this.state;
+    const {family,userProfile,showChargeModal,posts,loading,postsLoading} = this.state;
     return (
       <div>
           {loading ?
@@ -105,79 +139,99 @@ export default class Dashboard extends Component {
                 </div>
               :
               <div>
-                  <div id="main">
                       <div className=" row family-header" style={{backgroundImage: "url(" + family.cover_pic + ")",paddingBottom:20}}>
                           <div className="row">
-                              <div className="col-md-2 col-md-offset-5" style={{paddingTop: 15}}>
+                              <div className="col-md-2 family-header-pic" style={{paddingTop: 15}}>
                                   <div className="image-border">
                                     <Image id="family-pro-pic" src={family.pro_pic} circle responsive/>
                                   </div>
                               </div>
                           </div>
-                          <div className="row" >
-                              <br/>
-                              <button onClick={this.openChargeModal} className="btn btn-sm btn-primary">New Charge
-                              </button>
-                              {'  '}
-                              <button className="btn btn-sm btn-success">New Event</button>
-
-                          </div>
                       </div>
-                      <br/>
+                      <div className="row" style={{paddingTop:16}}>
+                        <div className="col col-sm-2">
+                          <div className="panel panel-default panel-shadow">
+                             <div className="panel-heading">
+                               Toolbox <i className="fa fa-briefcase"/>
+                             </div>
+                             <div className="panel-body toolbox-body">
+                             <div className="row">
+                              <button className="btn btn-sm btn-primary">Chores <i className="fa fa-caret-right"/></button>
+                              </div>
+                            <div className="row">
+                              <button className="btn btn-sm btn-primary">Finances  <i className="fa fa-caret-right"/></button>
+                              </div>
+                            <div className="row">
+                              <button className="btn btn-sm btn-primary">Events  <i className="fa fa-caret-right"/></button>
+                                  </div>
+                                </div>
+                               </div>
+                          </div>
+                    <div className="col col-sm-8">
+                          <div className="panel panel-default panel-shadow">
+                             <div className="panel-body posts-body">
+                             <div className = "post-form row">
+                              <div className="col col-sm-1">
+                                <Image style={{marginTop:13}}src={userProfile.pro_pic} responsive circle/>
+                              </div>
+                            <form onSubmit = {this.handlePostSubmit}>
+                                <input onChange={e => this.handleInputChange(e, "postSubmitText")} className="col col-sm-9 post-text-input" type="text" name="post-text" placeholder="Post to the family... (Pro Tip: You can tag a user using the @ key)"/>
+                                <div className="col col-sm-1">
+                                  <div className = "row form-icon">
+                                    <i className="fa fa-picture-o"/>
+                                  </div>
+                                  <div className = "row form-icon">                                  
+                                    <i className="fa fa-paperclip"/>
+                                  </div>
+                                </div>
+                                <div className="col col-sm-1 post-btn-wrapper">
+                                  <button className="btn post-btn btn-primary" type="submit">Post</button>
+                                </div>
+                            </form>
+                             </div>
+                            <div className="posts-wrapper">
+                            {postsLoading ?
+                                <div className="col-sm-2 col-sm-offset-5" style={{marginTop:45}}
+                                >
+                                  <ClipLoader
+                                  color={'#102C58'}
+                                  loading={postsLoading}
+                                />
+                                </div>
+                              :
+                              <div>
+                             {posts.map((post) =>
+                                      <div className="post-outer">
+                                        {post.message}
+                                      </div>
+                                  )}
+                             </div>
+                           }
+                            </div>
+                            </div>
+                      </div>
+                      </div>
+                      <div className = "col col-sm-2 ">
+                          <div className="panel panel-default panel-shadow">
+                             <div className="panel-heading">
+                               Next Event
+                             </div>
+                             <div className="panel-body event-preview">
+                                </div>
+                              </div>
+                        </div>
+                      <div className = "col col-sm-2 ">
+                          <div className="panel panel-default panel-shadow">
+                             <div className="panel-body slideshow-body">
+                                </div>
+                              </div>
+                        </div> 
+                      </div>
                       <div className="row">
-                          <div className="inner-board col col-sm-4">
-                              <h4>Finances</h4>
-                              <div>
-                                  {posts.map((post) =>
-                                      <div className="post-background">
-                                          <div>
-                                              <div className="col col-sm-1">
-                                                  <Image src={post.charge.created_by.pro_pic} circle responsive />
-                                              </div>
-                                              <div className="post-text">
-                                              {post.charge.created_by.first_name} spent ${post.charge.amount} at {post.charge.location}
-                                              </div>
-                                          </div>
-                                      </div>
-                                  )}
-                              </div>
-                          </div>
-                          <div className="inner-board col col-sm-4">
-                              <h4>Chores</h4>
-                              <div>
-                                  {posts.map((post) =>
-                                      <div className="post-background">
-                                          <div>
-                                              <div className="col col-sm-1">
-                                                  <Image src={post.charge.created_by.pro_pic} circle responsive />
-                                              </div>
-                                              <div className="post-text">
-                                              {post.charge.created_by.first_name} spent ${post.charge.amount} at {post.charge.location}
-                                              </div>
-                                          </div>
-                                      </div>
-                                  )}
-                              </div>
-                          </div>
-                          <div className="inner-board col col-sm-4">
-                              <h4>Events</h4>
-                              <div>
-                                  {posts.map((post) =>
-                                      <div className="post-background">
-                                          <div>
-                                              <div className="col col-sm-1">
-                                                  <Image src={post.charge.created_by.pro_pic} circle responsive />
-                                              </div>
-                                              <div className="post-text">
-                                              {post.charge.created_by.first_name} spent ${post.charge.amount} at {post.charge.location}
-                                              </div>
-                                          </div>
-                                      </div>
-                                  )}
-                              </div>
-                          </div>
+                      <div className="arrow-circle">
+                        <i className="fa fa-arrow-down"/>
                       </div>
-                  </div>
+                      </div>                         
                   <Modal show={this.state.showChargeModal} onHide={this.closeChargeModal}>
                       <form onSubmit={this.handleChargeSubmit}>
                           <Modal.Header closeButton>

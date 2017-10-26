@@ -352,7 +352,7 @@ export default class Chores extends Component {
       var alertClass = "main-alert alert alert-" + alertStyle;
       var rewardCheck = false;
         for(let i = 0 ; i < this.state.choreRewards; i++) {
-          if(choreRewards[i].is_redeemed = true) {
+          if(!choreRewards[i].is_redeemed) {
             rewardCheck = true;
             break;
           }

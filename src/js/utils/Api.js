@@ -139,7 +139,7 @@ class Api {
 
   updateUserProfile(data, onSuccess,onError) {
     return axios
-        .put(this.generateUrl("users/update/"+this.upid+"/", "v1"),data, {
+        .put(this.generateUrl("users/update/"+data.get("id")+"/", "v1"),data, {
           headers:this.generateTokenHeader(),
         })
         .then(response => {
@@ -186,7 +186,7 @@ class Api {
 
   getPosts() {
     return axios
-        .get(this.generateUrl("posts/"+this.user.family.id,"v1"), {
+        .get(this.generateUrl("notifications/posts/list/"+this.user.family.id,"v1"), {
           headers: this.generateTokenHeader()
       })
         .then(response=> {
@@ -323,6 +323,32 @@ class Api {
         })
   }
 
+  getNotifications(upid) {
+    return axios
+    .get(this.generateUrl("notifications/list/"+upid+"/","v1"), {
+      headers:this.generateTokenHeader(),
+    })
+    .then(response=> {
+      return response.data;
+    })
+    .catch(err=> {
+      return err;
+    })
+  }
+
+  readNotification(notif, upid) {
+    return axios
+    .get(this.generateUrl("notifications/read/"+notif+"/"+upid,"v1"), {
+      headers: this.generateTokenHeader(),
+    })
+    .then(response=> {
+      return response.data;
+    })
+    .catch(err=> {
+      return err;
+    })
+  }
+
   createPet(data, onSuccess, onError) {
     return axios
         .post(this.generateUrl("pets/create/"+this.user.family.id,"v1"),data, {
@@ -334,6 +360,19 @@ class Api {
         .catch(err => {
           return onError(err);
         })
+  }
+
+  createPost(data,onSuccess,onError) {
+    return axios
+    .post(this.generateUrl("notifications/posts/create","v1"),data, {
+      headers:this.generateTokenHeader()
+    })
+    .then(response => {
+      return onSuccess(response);
+    })
+    .catch(err => {
+      return onError(err);
+    })
   }
 
 }

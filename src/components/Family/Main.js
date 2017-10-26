@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import ApiInstance from "../../js/utils/Api";
 import Cookies from "js-cookie";
 import "./css/main.css";
+import isEmpty from 'lodash';
 import {
   Image,
   Alert,
@@ -45,13 +46,14 @@ export default class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: {},
-      admin:"",
-      family:{},
-      loading: true,
-        showLogoutModal:false,
-        selectedMenu:0,
-        dropDown:"none",
+    user: {},
+    admin:"",
+    family:{},
+    loading: true,
+    showLogoutModal:false,
+    selectedMenu:0,
+    dropDown:"none",
+    notificationDropDown:"none",
     alertStyle:"",
     alertMessage:"",
     alertVisible:false,
@@ -67,6 +69,8 @@ export default class Main extends Component {
     selectedSwitchPic:"",
     selectedUser:{},
     showEditProfileModal:false,
+    notifications:{},
+    unreadCount:0,
 
     };
     this.logout = this.logout.bind(this);
@@ -76,6 +80,7 @@ export default class Main extends Component {
     this.openMenu = this.openMenu.bind(this);
     this.selectedMenu = this.selectedMenu.bind(this);
     this.showDropdown = this.showDropdown.bind(this);
+    this.showNotificationDropdown = this.showNotificationDropdown.bind(this);
     this.handleAlertDismiss = this.handleAlertDismiss.bind(this);
     this.showChangeUserProPic = this.showChangeUserProPic.bind(this);
     this.hideChangeUserProPic = this.hideChangeUserProPic.bind(this);
@@ -91,6 +96,7 @@ export default class Main extends Component {
     this.selectedUser = this.selectedUser.bind(this);
     this.showEditProfileModal = this.showEditProfileModal.bind(this);
     this.hideEditProfileModal = this.hideEditProfileModal.bind(this);
+    this.handleNotificationRead = this.handleNotificationRead.bind(this);
   } 
 
   componentDidMount() {
@@ -106,6 +112,16 @@ export default class Main extends Component {
 
           });
       });
+          Promise.resolve(Api.getNotifications(upid)).then(response=> {
+            var count = 0;
+            if(response[0] != undefined) {
+              count =response[0].unread_count;
+            }
+            this.setState({
+              notifications: response,
+              unreadCount: count,
+            })
+          })
     });
     } else {
       this.props.router.push("/login");
@@ -218,6 +234,7 @@ export default class Main extends Component {
             this.setState({
               loading:false,
               showProfileModal:false,
+              alertVisible:false,
             })
             this.componentDidMount();
         }
@@ -258,6 +275,24 @@ export default class Main extends Component {
              dropDown: "none"
          })
      }
+  }
+
+  showNotificationDropdown() {
+     if(this.state.notificationDropDown === "none") {
+         this.setState({
+             notificationDropDown: "block"
+         })
+     } else {
+         this.setState({
+             notificationDropDown: "none"
+         })
+     }
+  }
+
+  handleNotificationRead(notif) {
+    Promise.resolve(Api.readNotification(notif, this.state.user.id)).then(response=> {
+      this.componentDidMount();
+    })
   }
 
   showChangeUserProPic() {
@@ -325,7 +360,6 @@ handleProPicSubmit() {
       loading:true,
   })
   const {user, uploadedFile} = this.state;
-  console.log(user.id)
   var formData = new FormData();
   formData.append("pro_pic",uploadedFile);
   formData.append("id",user.id);
@@ -359,8 +393,8 @@ handleProPicSubmit() {
 
 
   render() {
-    const { user,loading,family, dropDown, alertMessage,alertStyle, alertVisible, showChangeUserProPic, showProPicModal,uploadedFile,imagePreviewUrl,showPreview, picAlertMessage, picAlertVisible,
-      showProfileModal ,showPasswordInput, selectedSwitchPic,showEditProfileModal} = this.state;
+    const { user,loading,family, dropDown, notificationDropDown, alertMessage,alertStyle, alertVisible, showChangeUserProPic, showProPicModal,uploadedFile,imagePreviewUrl,showPreview, picAlertMessage, picAlertVisible,
+      showProfileModal ,showPasswordInput, selectedSwitchPic,showEditProfileModal,unreadCount,notifications} = this.state;
     const greeting = this.greeting;
     var alertClass = "main-alert alert alert-" + alertStyle;
     return (
@@ -382,17 +416,61 @@ handleProPicSubmit() {
                       <button onClick={this.openMenu} id="hamburger" className="hamburger-toggle"><span className="bar-top"/><span
                           className="bar-mid"/><span className="bar-bot"/></button>
                     </div>
-                    <div className="c-header-icon has-dropdown"><span
-                        className="c-badge c-badge--header-icon" >10</span><i style={styles.swing} className="fa fa-bell"></i>
-                      <div className="c-dropdown">
+                    <div className="c-header-icon has-dropdown" onClick={this.showNotificationDropdown}><i style={styles.swing} className="fa fa-bell"></i>
+                    {unreadCount > 0 ? 
+                    <span className="c-badge c-badge--header-icon" >{unreadCount}</span>
+                    :
+                    <div/>
+                    }   
+                    <div className="c-dropdown notification-dropdown" style={{display: notificationDropDown}}>
                         <div className="c-dropdown__header"/>
                         <div className="c-dropdown__content"/>
+                        {notifications[0] != undefined ?
+                          <div>
+                            {notifications.map((n)=>
+                              <div>
+                              {n.is_read ? 
+                              <div className="row notification-row n-read">
+                                <div className="notification-icon col col-sm-2">
+                                  <i className={"fa " + "fa-" + n.app}/>
+                                </div>
+                                <div className="notification-text col col-sm-8">
+                                  {n.message}
+                                  </div>
+                                  <div className="notification-time">
+                                  <i className="fa fa-clock-o"/> {n.time_ago} ago
+                                  </div>    
+                              </div>
+                              :
+                               <div  onClick = {() => this.handleNotificationRead(n.id)} className="row notification-row n-unread">
+                                <div className="notification-icon col col-sm-2">
+                                  <i className={"fa " + "fa-" + n.app}/>
+                                </div>
+                                <div className="notification-text col col-sm-8">
+                                  {n.message}
+                                  </div>     
+                                  <div className="notification-time">
+                                  <i className="fa fa-clock-o"/> {n.time_ago} ago
+                                  </div>                     
+                                </div>
+                        }
+                        </div>
+                        )}
+                            <div className="notifications-see-all">
+                              See all
+                            </div>
+                      </div>
+                      :
+                      <div className="no-notifications">
+                      No notifications at this time
+                      </div>
+                    }
                       </div>
                     </div>
                     <div className="family-txt">The {family.name} Family</div>
                     <div className="header-icons-group">
                       <div className="c-header-icon has-dropdown" onClick={this.showDropdown}><Image src={user.pro_pic} circle responsive/>
-                          <div className="c-dropdown c-dropdown--notifications" style={{display: dropDown}}>
+                          <div className="c-dropdown c-dropdown--notifications profile-dropdown" style={{display: dropDown}}>
                                 <div className="row">
                                     <div className="col col-sm-6 col-md-offset-3 dropdown-img">
                                         {showChangeUserProPic ?
